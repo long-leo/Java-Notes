@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="never" />
+    <meta name="description" content="一、前言 所谓IO，也就是Input/Output。Java程序跟外部进行的数据交换就叫做Java的IO操作。程序中数据的输入输出，被抽象为流， 按照相对于程序的流向，可分为输出流和输入流。 按照数据" />
+    <meta property="og:description" content="一、前言 所谓IO，也就是Input/Output。Java程序跟外部进行的数据交换就叫做Java的IO操作。程序中数据的输入输出，被抽象为流， 按照相对于程序的流向，可分为输出流和输入流。 按照数据" />
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Java的字节流，字符流和缓冲流对比探究 - Yuchao_Huang - 博客园</title>
+    <link id="favicon" rel="shortcut icon" href="//common.cnblogs.com/favicon.svg" type="image/svg+xml" />
+    
+    <link rel="stylesheet" href="/css/blog-common.min.css?v=Ey2dEx6TCJEMq7i5rGGloHkehiHv58PKGLPsLJ6UZME" />
+    <link id="MainCss" rel="stylesheet" href="/skins/bluesky/bundle-bluesky.min.css?v=zmj3HmJ_mSawmoJIJ_uRF0jBERXIECmElLJn3kqfwRA" />
+    <link type="text/css" rel="stylesheet" href="https://www.cnblogs.com/misterchaos/custom.css?v=mm8B87USUQA9a5uLYr7T&#x2B;q&#x2B;aBIE=" />
+    <link id="mobile-style" media="only screen and (max-width: 767px)" type="text/css" rel="stylesheet" href="/skins/bluesky/bundle-bluesky-mobile.min.css?v=aPLTLGTW9gWgNnbzAv5GStR8fCDZa8gRB5bmadJN9s8" />
+    
+    <link type="application/rss+xml" rel="alternate" href="https://www.cnblogs.com/misterchaos/rss" />
+    <link type="application/rsd+xml" rel="EditURI" href="https://www.cnblogs.com/misterchaos/rsd.xml" />
+    <link type="application/wlwmanifest+xml" rel="wlwmanifest" href="https://www.cnblogs.com/misterchaos/wlwmanifest.xml" />
+    <script>
+        var currentBlogId = 584199;
+        var currentBlogApp = 'misterchaos';
+        var cb_enable_mathjax = false;
+        var isLogined = false;
+        var isBlogOwner = false;
+        var skinName = 'BlueSky';
+        var visitorUserId = '';
+    </script>
+        <script>
+            var currentPostDateAdded = '2020-05-29 08:07';
+        </script>
+    <script src="https://common.cnblogs.com/scripts/jquery-2.2.0.min.js"></script>
+    <script src="/js/blog-common.min.js?v=fpNyGJiZbMIj_hV-4r_YVYKk6F5SYAtZbDu1Qd_MyN4"></script>
+    
+    
+    
+</head>
+<body class="no-navbar">
+    <a name="top"></a>
+    <div id="top_nav" class="navbar forpc navbar-custom">
+        <nav id="nav_main" class="navbar-main">
+            <ul id="nav_left" class="navbar-list navbar-left">
+                <li class="navbar-branding"><a href="https://www.cnblogs.com/" title="开发者的网上家园"><img src="/images/logo.svg?v=R9M0WmLAIPVydmdzE2keuvnjl-bPR7_35oHqtiBzGsM" alt="博客园Logo" /></a></li>
+                <li><a href="/" onclick="ga('send', 'event', 'Link', 'click', 'skin-navbar-sitehome')">首页</a></li>
+                <li><a href="https://news.cnblogs.com/" onclick="ga('send', 'event', 'Link', 'click', 'skin-navbar-news')">新闻</a></li>
+                <li><a href="https://q.cnblogs.com/" onclick="ga('send', 'event', 'Link', 'click', 'skin-navbar-q')">博问</a></li>
+                <li><a id="nav_brandzone" href="https://brands.cnblogs.com/" onclick="ga('send', 'event', 'Link', 'click', 'skin-navbar-brands')">专区</a></li>
+                <li><a href="https://ing.cnblogs.com/" onclick="ga('send', 'event', 'Link', 'click', 'skin-navbar-ing')">闪存</a></li>
+                <li><a href="https://edu.cnblogs.com/" onclick="ga('send', 'event', 'Link', 'click', 'skin-navbar-edu')">班级</a></li>
+            </ul>
+            <ul id="nav_right" class="navbar-list navbar-right">
+                <li>
+                    <form id="zzk_search" class="navbar-search" action="https://zzk.cnblogs.com/s" method="get">
+                        <input name="w" id="zzk_search_input" placeholder="代码改变世界" type="text" tabindex="3" />
+                        <button type="submit" id="zzk_search_button">
+                            <img src="/images/aggsite/search.svg" alt="搜索" />
+                        </button>
+                    </form>
+                </li>
+                <li id="navbar_login_status" class="navbar-list">
+                    <a id="navblog-myblog-icon" class="navbar-user-info navbar-blog" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx" alt="我的博客" title="我的博客">
+                        <img id="myblog_icon" class="navbar-icon" src="/images/aggsite/myblog.svg" alt="我的博客" />
+                    </a>
+                    <a class="navbar-user-info navbar-message navbar-icon-wrapper" href="https://msg.cnblogs.com/" alt="短消息" title="短消息">
+                        <img id="msg_icon" class="navbar-icon" src="/images/aggsite/message.svg?v=oS4PkibyMjZ9rGD5XAcLt99uW_s76Javy2up4dbnZNY" alt="短消息" />
+                        <span id="msg_count" style="display: none"></span>
+                    </a>
+                    <div id="user_info" class="navbar-user-info dropdown">
+                        <a class="dropdown-button" href="https://home.cnblogs.com/">
+                            <img id="user_icon" class="navbar-avatar" src="/images/aggsite/avatar-default.svg" alt="用户头像" />
+                        </a>
+                        <div class="dropdown-menu">
+                            <a id="navblog-myblog-text" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx">我的博客</a>
+                            <a href="https://home.cnblogs.com/">我的园子</a>
+                            <a href="https://account.cnblogs.com/settings/account">账号设置</a>
+                            <a href="javascript:void(0)" onclick="logout();">退出登录</a>
+                        </div>
+                    </div>
+                    <a class="navbar-anonymous" href="https://account.cnblogs.com/signup/">注册</a>
+                    <a class="navbar-anonymous" href="javascript:void(0);" onclick="login()">登录</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <div id="page_begin_html">
+        <!-- ............自定义首部代码开始............ -->
+<!-- 自定义进度条 -->
+<div id="myProgressBar" style="display: block;"></div>
+
+<!-- 自定义导航条 -->
+<div id="mynavbar" style="margin-top: 0px;">
+  <div style="position: relative; width: 65pc; height: 70px; margin: 0 auto;">
+    <a
+      style="width: auto; height: 22px; margin-left: 25px;"
+      class="c-c"
+      href="https://www.cnblogs.com/misterchaos"
+    >
+      <img
+        id="nv-icon"
+        style="width: auto; height: 22px; outline: 0; margin-top: 25px;"
+      />
+    </a>
+    <div id="mynavbar_menu">
+      <a href="https://www.cnblogs.com/misterchaos" class="c-c">首页</a>
+      <a href="https://msg.cnblogs.com/send/misterchaos" class="c-c">联系</a>
+      <a id="myGayhubUrl" href="https://github.com/misterchaos" class="c-c"
+        >Github</a
+      >
+      <a id="friendLink" href="#">友情链接</a>
+      <a href="https://www.cnblogs.com/">博客园</a>
+      <a href="https://i.cnblogs.com/posts">管理</a>
+      <a id="aboutMe" href="#">关于</a>
+    </div>
+  </div>
+</div>
+
+<!-- 自定义头部锚点 -->
+<a name="mtop"></a>
+
+<!-- 自定义头部 -->
+<div id="myheader">
+  <!-- 背景图片 -->
+  <div id="myheader_bg"></div>
+  <!-- 遮罩层 -->
+  <div id="myheader_cover" title="点我点我">
+    <!-- 博客标题 -->
+    <div id="mypost_title">
+      <div id="mypost_title_h" style="font-weight: 500; font-size: 21px;"></div>
+      <div id="mypost_title_f"></div>
+      <div id="mypost_title_e">
+        <a href="https://www.cnblogs.com/" class="c-c" style="display: none;"
+          >暂未分类</a
+        >
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ............自定义首部代码结束............ -->
+
+
+
+
+    </div>
+    <!--done-->
+<div id="home">
+<div id="header">
+	<div id="blogTitle">
+        <a id="lnkBlogLogo" href="https://www.cnblogs.com/misterchaos/"><img id="blogLogo" src="/skins/custom/images/logo.gif" alt="返回主页" /></a>		
+		
+<!--done-->
+<h1><a id="Header1_HeaderTitle" class="headermaintitle HeaderMainTitle" href="https://www.cnblogs.com/misterchaos/">Yuchao Huang的博客</a>
+</h1>
+<h2></h2>
+
+
+
+
+		
+	</div><!--end: blogTitle 博客的标题和副标题 -->
+	<div id="navigator">
+		
+<ul id="navList">
+<li><a id="blog_nav_sitehome" class="menu" href="https://www.cnblogs.com/">
+博客园</a>
+</li>
+<li>
+<a id="blog_nav_myhome" class="menu" href="https://www.cnblogs.com/misterchaos/">
+首页</a>
+</li>
+<li>
+
+
+</li>
+<li>
+</li>
+<li>
+
+<!--<partial name="./Shared/_XmlLink.cshtml" model="Model" /></li>--></li>
+<li>
+<a id="blog_nav_admin" class="menu" href="https://i.cnblogs.com/">
+管理</a>
+</li>
+</ul>
+
+
+		<div class="blogStats">
+			<div id="blog_stats_place_holder"><script>loadBlogStats();</script></div>
+		</div><!--end: blogStats -->
+	</div><!--end: navigator 博客导航栏 -->
+</div><!--end: header 头部 -->
+<div id="main">
+	<div id="mainContent">
+	<div class="forFlow">
+		<div id="post_detail">
+    <!--done-->
+    <div id="topics">
+        <div class="post">
+            <h1 class = "postTitle">
+                
+<a id="cb_post_title_url" class="postTitle2 vertical-middle" href="https://www.cnblogs.com/misterchaos/p/12985332.html">
+    <span>Java的字节流，字符流和缓冲流对比探究</span>
+    
+
+
+</a>
+
+            </h1>
+            <div class="clear"></div>
+            <div class="postBody">
+                
+<div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
+    <p></p><div class="toc"><div class="toc-container-header">目录</div><ul><li><a href="#一、前言">一、前言</a></li><li><a href="#二、字节操作和字符操作">二、字节操作和字符操作</a></li><li><a href="#三、两种方式的效率测试">三、两种方式的效率测试</a><ul><li><a href="#31-测试代码">3.1 测试代码</a></li><li><a href="#32-测试结果">3.2 测试结果</a></li><li><a href="#33-结果分析">3.3 结果分析</a></li></ul></li><li><a href="#四、字节顺序endian">四、字节顺序endian</a></li><li><a href="#五、综合对比">五、综合对比</a></li><li><a href="#六、总结">六、总结</a></li></ul></div><p></p>
+<h2 id="一、前言">一、前言</h2>
+<p>所谓IO，也就是Input/Output。Java程序跟外部进行的数据交换就叫做Java的IO操作。程序中数据的输入输出，被抽象为流， 按照相对于程序的流向，可分为输出流和输入流。 <strong>按照数据流的格式，可分为字节流和字符流</strong>。Java IO流的体系很庞大，功能丰富。</p>
+<p>本文主要探讨了Java中字节操作和字符操作的区别。</p>
+<h2 id="二、字节操作和字符操作">二、字节操作和字符操作</h2>
+<p>下图可以表示Java 的IO体系：</p>
+<p><img src="http://img.hellochaos.cn/img/20201207191752.jpg" alt="" loading="lazy"></p>
+<p>类似于C语言中二进制文件和文本文件的区别，字符其实只是一种特殊的二进制字节，是按照一定的编码方式处理之后，按照一定规则来存储信息的数据，字符在计算机中也是由二进制组成的，只不过这种二进制可以按照一种规则解码后，成为人类可以直接阅读的自然语言，而普通的二进制文件只有计算机能直接“阅读”。<strong>字节操作和字符操作的区别就在于数据的格式。</strong></p>
+<p>在Java中，字节输入输出流有两个抽象基类：</p>
+<ul>
+<li>字节输入流：InputStream</li>
+<li>字节输出流：OutputStream</li>
+</ul>
+<p>字符输入输出流也有两个抽象基类：</p>
+<ul>
+<li>字符输入流：Reader</li>
+<li>字符输出流：Writer</li>
+</ul>
+<p>此外， Java提供了从字节流到字符流的转换流，分别是InputStreamReader和OutputStreamWriter，但没有从字符流到字节流的转换流。实际上：</p>
+<p><strong>字符流=字节流+编码表</strong></p>
+<p>一次读取一个字节数组的效率明显比一次读取一个字节的效率高，因此Java提供了带缓冲区的字节类，称为字节缓冲区类：<strong>BufferedInputStream和BufferedOutputStream</strong>，同理还有字符缓冲区类<strong>BufferedReader和BufferedWriter。</strong></p>
+<p><strong>在使用场景上，无法直接获取文本信息的二进制文件，比如图片，mp3，视频文件等，只能使用字节流。而对于文本信息，则更适合使用字符流。</strong></p>
+<h2 id="三、两种方式的效率测试">三、两种方式的效率测试</h2>
+<p>下面通过编写测试程序来比较两种方式的效率区别：</p>
+<h3 id="31-测试代码">3.1 测试代码</h3>
+<p>笔者编写了8个方法来分别测试字节方式/字符方式的输入输出流，带缓冲区的输入输出流。</p>
+<pre><code class="language-java">package com.verygood.island;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.platform.commons.annotation.Testable;
+
+import java.io.*;
+
+/**
+ * @author &lt;a href="mailto:kobe524348@gmail.com"&gt;黄钰朝&lt;/a&gt;
+ * @description
+ * @date 2020-05-27 08:50
+ */
+@Testable
+public class UnitTest {
+
+    public static final String PATH = "C:\\Users\\Misterchaos\\Documents\\Java Develop Workplaces\\" +
+            "Github repository\\island\\src\\test\\java\\com\\verygood\\island\\";
+
+    /**
+     * 用于输出的对象
+     */
+    public static byte[] outputbytes = null;
+
+    public static char[] outputchars = null;
+
+    int count = 1;
+
+    /**
+     * 用于输入的对象
+     */
+    public static final File inputFile = new File("C:\\Users\\Misterchaos\\Downloads\\安装包\\TEST.zip");
+
+
+    @BeforeClass
+    public static void before() {
+        StringBuilder stringBuilder = new StringBuilder("");
+        for (int i = 0; i &lt; 1000000; i++) {
+            stringBuilder.append("stringstringstringstringstringstring");
+        }
+        outputbytes = stringBuilder.toString().getBytes();
+        outputchars = stringBuilder.toString().toCharArray();
+    }
+
+
+    @Test
+    public void test0() {
+        System.out.println("--------------------------------------------------------");
+        System.out.println("                      测试输出流                          ");
+        System.out.println("--------------------------------------------------------");
+    }
+
+
+    // 字节流
+    @Test
+    public void test1() {
+        try {
+            System.out.println("********方式一：字节流输出**********");
+            // 新建文件命名
+            String name = PATH + "字节流输出文件.txt";
+            File file = new File(name);
+            // 创建输入输出流对象
+            FileOutputStream fos = new FileOutputStream(file);
+            // 读写数据
+            long s1 = System.currentTimeMillis();// 测试开始，计时
+            writeBytes(fos);
+            long s2 = System.currentTimeMillis();// 测试结束，计时
+            fos.close();
+            System.out.println("输出文件耗时：" + (s2 - s1) + "ms");
+            System.out.println("文件大小：" + file.length() / 1024 + "KB");
+            file.delete();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    // 字节流
+    @Test
+    public void test2() {
+        try {
+            System.out.println("********方式二：字符流输出**********");
+            // 新建文件命名
+            String name = PATH + "字符流输出文件.txt";
+            File file = new File(name);
+            // 创建输入输出流对象
+            FileWriter fileWriter = new FileWriter(file);
+            // 读写数据
+            long s1 = System.currentTimeMillis();// 测试开始，计时
+            writeChars(fileWriter);
+            long s2 = System.currentTimeMillis();// 测试结束，计时
+            fileWriter.close();
+            System.out.println("输出文件耗时：" + (s2 - s1) + "ms");
+            System.out.println("文件大小：" + file.length() / 1024 + "KB");
+            file.delete();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    // 字节缓冲流
+    @Test
+    public void test3() {
+        try {
+            System.out.println("********方式三：字节缓冲流输出**********");
+            // 新建文件命名
+            String name = PATH + "字节缓冲流输出文件.txt";
+            File file = new File(name);
+            // 创建输入输出流对象
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
+            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+            // 读写数据
+            long s1 = System.currentTimeMillis();// 测试开始，计时
+            writeBytes(bufferedOutputStream);
+            long s2 = System.currentTimeMillis();// 测试结束，计时
+            bufferedOutputStream.close();
+            System.out.println("输出文件耗时：" + (s2 - s1) + "ms");
+            System.out.println("文件大小：" + file.length() / 1024 + "KB");
+            file.delete();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    // 字符缓冲流
+    @Test
+    public void test4() {
+        try {
+            System.out.println("********方式四：字符缓冲流输出**********");
+            // 新建文件命名
+            String name = PATH + "字符缓冲流输出文件.txt";
+            File file = new File(name);
+            // 创建输入输出流对象
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
+            // 读写数据
+            long s1 = System.currentTimeMillis();// 测试开始，计时
+            for (int i = 0; i &lt; count; i++) {
+                bufferedWriter.write(outputchars);
+            }
+            long s2 = System.currentTimeMillis();// 测试结束，计时
+            bufferedWriter.close();
+
+            System.out.println("输出文件耗时：" + (s2 - s1) + "ms");
+            System.out.println("文件大小：" + file.length() / 1024 + "KB");
+            file.delete();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Test
+    public void test5() {
+        System.out.println("--------------------------------------------------------");
+        System.out.println("                      测试输入流                          ");
+        System.out.println("--------------------------------------------------------");
+    }
+
+
+    // 字节流
+    @Test
+    public void test6() {
+        try {
+            System.out.println("********方式一：字节流输入**********");
+            // 新建文件命名
+            // 创建输入输出流对象
+            long s1 = System.currentTimeMillis();// 测试开始，计时
+            FileInputStream fileInputStream = new FileInputStream(inputFile);
+            // 读写数据
+            // 读写数据
+            while (fileInputStream.read() != -1) {
+            }
+            fileInputStream.close();
+            long s2 = System.currentTimeMillis();// 测试结束，计时
+            System.out.println("输入文件耗时：" + (s2 - s1) + "ms");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 字节流
+    @Test
+    public void test7() {
+        try {
+            System.out.println("********方式二：字符流输入**********");
+            // 新建文件命名
+            long s1 = System.currentTimeMillis();// 测试开始，计时
+            // 创建输入输出流对象
+            FileReader fileReader = new FileReader(inputFile);
+            // 读写数据
+            while (fileReader.read() != -1) {
+            }
+            fileReader.close();
+            long s2 = System.currentTimeMillis();// 测试结束，计时
+            System.out.println("输入文件耗时：" + (s2 - s1) + "ms");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 字节缓冲流
+    @Test
+    public void test8() {
+        try {
+            System.out.println("********方式三：字节缓冲流输入**********");
+            // 新建文件命名
+            long s1 = System.currentTimeMillis();// 测试开始，计时
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(inputFile));
+            // 创建输入输出流对象
+            // 读写数据
+            while (bufferedInputStream.read() != -1) {
+            }
+            bufferedInputStream.close();
+            long s2 = System.currentTimeMillis();// 测试结束，计时
+            System.out.println("输入文件耗时：" + (s2 - s1) + "ms");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    // 字符缓冲流
+    @Test
+    public void test9() {
+        try {
+            System.out.println("********方式四：字符缓冲流输入**********");
+            // 新建文件命名
+            long s1 = System.currentTimeMillis();// 测试开始，计时
+            // 创建输入输出流对象
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(inputFile));
+            // 读写数据
+            while (bufferedReader.read() != -1) {
+            }
+            bufferedReader.close();
+            long s2 = System.currentTimeMillis();// 测试结束，计时
+            System.out.println("输入文件耗时：" + (s2 - s1) + "ms");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    /**
+     * 字节输出
+     */
+    private void writeBytes(OutputStream fos) throws IOException {
+        for (int i = 0; i &lt; count; i++) {
+            for (int j = 0; j &lt; outputbytes.length; j++) {
+                fos.write(outputbytes[j]);
+            }
+        }
+    }
+
+    /**
+     * 字符输出
+     */
+    private void writeChars(Writer writer) throws IOException {
+        for (int i = 0; i &lt; count; i++) {
+            for (int j = 0; j &lt; outputchars.length; j++) {
+                writer.write(outputchars[j]);
+            }
+        }
+    }
+
+
+}
+</code></pre>
+<h3 id="32-测试结果">3.2 测试结果</h3>
+<p>测试结果如下：</p>
+<pre><code class="language-json">--------------------------------------------------------
+                      测试输出流                          
+--------------------------------------------------------
+********方式一：字节流输出**********
+输出文件耗时：153798ms
+文件大小：35156KB
+
+********方式二：字符流输出**********
+输出文件耗时：5503ms
+文件大小：35156KB
+
+********方式三：字节缓冲流输出**********
+输出文件耗时：514ms
+文件大小：35156KB
+
+********方式四：字符缓冲流输出**********
+输出文件耗时：600ms
+文件大小：35156KB
+--------------------------------------------------------
+                      测试输入流                          
+--------------------------------------------------------
+********方式一：字节流输入**********
+输入文件耗时：3643276ms
+
+********方式二：字符流输入**********
+输入文件耗时：93332ms
+
+********方式三：字节缓冲流输入**********
+输入文件耗时：4700ms
+
+********方式四：字符缓冲流输入**********
+输入文件耗时：51538ms
+</code></pre>
+<h3 id="33-结果分析">3.3 结果分析</h3>
+<p>测试发现，<strong>如果输出的对象是整个直接输出到文件，使用带缓冲区的输出流实际效率更低</strong>，实际测试得到结果是：带缓冲区的输出流所需时间大约是不带缓冲区输出流的两倍。查看源码可以看到：</p>
+<pre><code class="language-java"> public synchronized void write(byte b[], int off, int len) throws IOException {
+        if (len &gt;= buf.length) {
+            /* If the request length exceeds the size of the output buffer,
+               flush the output buffer and then write the data directly.
+               In this way buffered streams will cascade harmlessly. */
+            flushBuffer();
+            out.write(b, off, len);
+            return;
+        }
+        if (len &gt; buf.length - count) {
+            flushBuffer();
+        }
+        System.arraycopy(b, off, buf, count, len);
+        count += len;
+ }
+</code></pre>
+<p>其中的注释已经清楚地写出来，<strong>如果写入的长度大于缓冲区的大小，则先刷新缓存区，然后直接写入文件。简而言之，就是不使用缓冲区！</strong></p>
+<p>因此，笔者重新设计了使用场景，将一次性的输出改为了一个字节一个字节地输出，上面展示的就是改进后的测试结果。<strong>从这一次结果来看，带缓冲区的字节输出流有了非常明显的优势，整体的性能提升了将近400倍！</strong></p>
+<p>而<strong>在FileWriter和FileOutputStream的比较中，发现FileOutputStream的速度明显更慢，</strong>查看源码发现：</p>
+<p>FileWriter内部调用了StreamEncoder来输出，而StreamEncoder内部维护了一个8192大小的缓冲区。<strong>这样就不难解释为什么FileOutputStream使用字节的方式节省了编码开销反而效率更低，原因就在于FileWriter实际是带有缓冲区的，因此FileWriter在使用了BufferedWriter封装之后性能只有2倍的提升也就不足为奇了。</strong></p>
+<h2 id="四、字节顺序endian">四、字节顺序endian</h2>
+<blockquote>
+<p>字节序，或字节顺序（"Endian"、"endianness" 或 "byte-order"），描述了计算机如何组织字节，组成对应的数字。<strong>大端字节序（big-endian）</strong>：高位字节在前，低位字节在后。小端字节序（little-endian）反之。</p>
+</blockquote>
+<p>笔者使用编写了测试代码来测试C语言中二进制和文本两种方式效率区别，代码如下：</p>
+<pre><code class="language-c++">#define _CRT_SECURE_NO_WARNINGS
+#include "stdio.h" 
+#include &lt;stdlib.h&gt; 
+#include "time.h"  
+#define CLOCKS_PER_SEC ((clock_t)1000)  
+
+int main()
+{
+	FILE* fpRead = fopen("C:\\test.txt", "r");
+	if (fpRead == NULL)
+	{
+		printf("文件打开失败");
+		return 0;
+	}
+	clock_t start, finish;
+	int a=0;
+	start = clock();
+	while (!feof(fpRead))
+	{
+		a = fgetc(fpRead);
+	}
+	finish = clock();
+	double text_duration = (double)(finish - start) / CLOCKS_PER_SEC;
+	printf("\n");
+	
+
+	fclose(fpRead);
+	
+	fpRead = fopen("C:\\test.txt","rb");
+
+	if (fpRead == NULL)
+	{
+		printf("文件打开失败");
+		return 0;
+	}
+	start = clock();
+	while (!feof(fpRead))
+	{
+		a = fgetc(fpRead);
+	}
+	finish = clock();
+	double binary_duration = (double)(finish - start) / CLOCKS_PER_SEC;
+	printf("\n");
+
+	printf("文本方式耗时：%f seconds\n", text_duration);
+	printf("二进制方式耗时：%f seconds\n", binary_duration);
+
+	system("pause");
+	return 1;
+}
+</code></pre>
+<p>运行结果：</p>
+<pre><code class="language-C">文本方式耗时：3.042000 seconds
+二进制方式耗时：2.796000 seconds
+</code></pre>
+<p>可以看到二进制的方式效率比文本方式稍微有所提高。</p>
+<h2 id="五、综合对比">五、综合对比</h2>
+<p>根据以上实验，可以总结得出，字节流和字符流具有以下区别：</p>
+<ul>
+<li>在同样使用缓冲区的前提下，<strong>字节流比字符流的效率稍微高一点</strong>。对于频繁操作且每次输入输出的数据量较小时，使用缓冲区可以带来明显的效率提升。</li>
+<li>操作对象上，<strong>字节流操作的基本单元为字节，字符流操作的基本单元为Unicode码元</strong>（字符）。</li>
+<li>字节流通常用于处理二进制数据，实际上它可以处理任意类型的数据，但它不支持直接写入或读取Unicode码元。而字符流通常处理文本数据，它支持写入及读取Unicode码元。</li>
+<li>从源码可以看出来，<strong>字节流默认不使用缓冲区，而字符流内部使用了缓冲区</strong>。</li>
+</ul>
+<h2 id="六、总结">六、总结</h2>
+<p>在这次博客编写过程中，测试字节流和字符流的效率时曾出现非常令人费解的结果，使用BufferWriter和BufferedOutputSteam封装的输出流效率都没有提高反而有所降低，后来查看源码才发现了问题所在。此外，字节流的效率明显低于字符流也令笔者抓狂，最后发现字符流内部维护了缓冲区，问题才迎刃而解。</p>
+
+</div>
+<div id="MySignature"></div>
+<div class="clear"></div>
+<div id="blog_post_info_block">
+    <div id="blog_post_info"></div>
+    <div class="clear"></div>
+    <div id="post_next_prev"></div>
+</div>
+            </div>
+            <div class="postDesc">posted @ 
+<span id="post-date">2020-05-29 08:07</span>&nbsp;
+<a href="https://www.cnblogs.com/misterchaos/">Yuchao_Huang</a>&nbsp;
+阅读(<span id="post_view_count">1391</span>)&nbsp;
+评论(<span id="post_comment_count">12</span>)&nbsp;
+<a href="https://i.cnblogs.com/EditPosts.aspx?postid=12985332" rel="nofollow">编辑</a>&nbsp;
+<a href="javascript:void(0)" onclick="AddToWz(12985332);return false;">收藏</a></div>
+        </div>
+	    
+	    
+    </div><!--end: topics 文章、评论容器-->
+</div>
+<script src="https://common.cnblogs.com/highlight/10.3.1/highlight.min.js"></script>
+<script>markdown_highlight();</script>
+<script>
+    var allowComments = true, cb_blogId = 584199, cb_blogApp = 'misterchaos', cb_blogUserGuid = '90d75b02-9db8-4a79-eb03-08d6b9cefa37';
+    var cb_entryId = 12985332, cb_entryCreatedDate = '2020-05-29 08:07', cb_postType = 1;
+    updatePostStats(
+        [cb_entryId],
+        function(id, count) { $("#post_view_count").text(count) },
+        function(id, count) { $("#post_comment_count").text(count) })
+</script>
+<a name="!comments"></a>
+<div id="blog-comments-placeholder"></div>
+<div id="comment_form" class="commentform">
+    <a name="commentform"></a>
+    <div id="divCommentShow"></div>
+    <div id="comment_nav"><span id="span_refresh_tips"></span><a href="javascript:void(0);" onclick="return RefreshCommentList();" id="lnk_RefreshComments" runat="server" clientidmode="Static">刷新评论</a><a href="#" onclick="return RefreshPage();">刷新页面</a><a href="#top">返回顶部</a></div>
+    <div id="comment_form_container"></div>
+    <div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+    <div id="ad_t2"></div>
+    <div id="opt_under_post"></div>
+    <div id="cnblogs_c1" class="c_ad_block">
+        <div id='div-gpt-ad-1592365906576-0' style='width: 300px; height: 250px;'></div>
+    </div>
+    <div id="under_post_news"></div>
+    <div id="cnblogs_c2" class="c_ad_block">
+        <div id='div-gpt-ad-1592366332455-0' style='width: 468px; height: 60px;'></div>
+    </div>
+    <div id="under_post_kb"></div>
+    <div id="HistoryToday" class="c_ad_block"></div>
+    <script type="text/javascript">
+       var commentManager = new blogCommentManager();
+       commentManager.renderComments(0);
+       fixPostBody();
+       deliverBigBanner();
+setTimeout(function() { incrementViewCount(cb_entryId); }, 50);       deliverT2();
+       deliverC1C2();
+       loadNewsAndKb();
+       loadBlogSignature();
+LoadPostCategoriesTags(cb_blogId, cb_entryId);       LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+       GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+       loadOptUnderPost();
+       GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);
+   </script>
+</div>
+
+	</div><!--end: forFlow -->
+	</div><!--end: mainContent 主体内容容器-->
+	<div id="sideBar">
+		<div id="sideBarMain">
+			
+<div id="sidebar_c3"></div>
+			<div id="blog-calendar" style="display:none"></div><script>loadBlogDefaultCalendar();</script>			
+			<div id="leftcontentcontainer">
+				<div id="blog-sidecolumn"></div>
+                    <script>loadBlogSideColumn();</script>
+			</div>			
+		</div><!--end: sideBarMain -->
+	</div><!--end: sideBar 侧边栏容器 -->
+	<div class="clear"></div>
+	</div><!--end: main -->
+	<div class="clear"></div>
+	<div id="footer">
+		<!--done-->
+Copyright &copy; 2021 Yuchao_Huang
+<br /><span id="poweredby">Powered by .NET 5.0 on Kubernetes</span>
+
+
+
+	</div><!--end: footer -->
+</div><!--end: home 自定义的最大容器 -->
+
+
+    <div id="page_end_html">
+        <!-- ............自定义尾部代码开始............ -->
+<div id="post-bottom-bar" class="post-bottom-bar" style="bottom: -3pc;">
+  <div class="bottom-bar-inner">
+    <!-- 左边 -->
+    <div class="bottom-bar-items social-share" style="float: left;">
+      <span class="bottom-bar-item bottom-bar-facebook">
+        <a id="bottom-d" href="javascript:void(0)" target="_blank">好文要赞</a>
+      </span>
+      <span class="bottom-bar-item bottom-bar-twitter">
+        <a id="bottom-g" href="javascript:void(0)" target="_blank">关注我</a>
+      </span>
+      <span class="bottom-bar-item bottom-bar-qrcode">
+        <a id="bottom-s" href="javascript:void(0)" target="_blank">收藏该文</a>
+      </span>
+    </div>
+    <!-- 右边 -->
+    <div class="bottom-bar-items right" style="float: right;">
+      <span class="bottom-bar-item bottom-bar-qrcode">
+        <a id="mbottom-left" href="javascript:void(0)">上一篇：无</a>
+      </span>
+      <span class="bottom-bar-item bottom-bar-qrcode">
+        <a id="mbottom-right" href="javascript:void(0)">下一篇：无</a>
+      </span>
+      <!-- <span class="bottom-bar-item"
+        ><a id="mbottom-left" href="javascript:void(0);">←</a></span
+      >
+      <span class="bottom-bar-item"
+        ><a id="mbottom-right" href="javascript:void(0);">→</a></span
+      > -->
+      <span class="bottom-bar-item"
+        ><a href="javascript:void(0)" onclick="scrollToBottom()">↓</a></span
+      >
+      <span class="bottom-bar-item"
+        ><a href="javascript:void(0)" onclick="scrollToTop()">↑</a></span
+      >
+    </div>
+  </div>
+</div>
+<a name="mfooter"></a>
+
+<!-- 遮罩层（用于图片点击放大），
+    代码来自https://www.cnblogs.com/zhanxiaoyun/p/8259451.html-->
+<div
+  id="outerdiv"
+  style="
+    text-align: center;
+    position: fixed;
+    z-index: 998;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(255, 255, 255);
+    display: block;
+  "
+>
+  <img
+    id="bigimg"
+    style="
+      height: auto;
+      width: auto;
+      border: 0;
+      margin: auto;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    "
+    src="http://img.hellochaos.cn/img/20200723183419.png"
+  />
+</div>
+<!-- ............自定义尾部代码结束............ -->
+<script type="text/javascript">
+  //标签页网页标题
+  var blogTitle = "Yuchao Huang' Blog";
+  //博主名称 可不改，默认取博客园提供的
+  var nickName = "Yuchao Huang";
+  //slogan
+  var slogan ="Fan of Lakers,enjoy playing the guitar, currently focused on the backend development";
+  //icon
+  var icon = "http://img.hellochaos.cn/img/20200723183419.png";
+  //默认博客背景图片
+  var defaultPic = "http://img.hellochaos.cn/img/20200723190751.png";
+  //icon(浏览器标题栏上的)
+  var iconB = "https://pic.cnblogs.com/face/1654007/20200723184527.png";
+  //友情链接地址
+  var friendLink = "https://www.cnblogs.com/misterchaos/";
+  //关于地址
+  var aboutMe = "https://www.cnblogs.com/misterchaos/p/12443646.html";
+  //Github地址,假如博客username与Github username相同，不用改。
+  //如 cnblogs.com/username github.com/username 这样就不用改
+  var myGayhubUrl = "https://github.com/misterchaos";
+</script>
+
+<script>
+  function google_ga() {
+    try {
+      console.log("===*v*===");
+      /*google_analytics(window, document, "script", "https://www.google-analytics.com/analytics.js", "ga");
+          ga("create", "UA-476124-1", "auto");
+          ga("send", "pageview")*/
+    } catch (n) {}
+  }
+</script>
+
+<script src="https://blog-static.cnblogs.com/files/misterchaos/nprogress.min.js"></script>
+<script src="https://blog-static.cnblogs.com/files/misterchaos/jquery.pjax.min.js"></script>
+<script src="https://blog-static.cnblogs.com/files/misterchaos/OwO.min.js"></script>
+<script src="https://blog-static.cnblogs.com/files/misterchaos/highlight.min.js"></script>
+<script src="https://blog-static.cnblogs.com/files/misterchaos/clipboard.min.js"></script>
+<script src="https://blog-static.cnblogs.com/files/misterchaos/SmoothScroll.min.js"></script>
+<script src="https://blog-static.cnblogs.com/files/misterchaos/common.min.js"></script>
+
+    </div>
+</body>
+</html>
