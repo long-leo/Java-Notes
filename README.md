@@ -1,2 +1,2 @@
 # Java-Notes
-Record my Java Learning
+Record my Java learning.
