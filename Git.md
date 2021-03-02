@@ -1,6 +1,6 @@
 # Git
 
-本地文件上传到github
+## 本地文件上传到github
 
 ssh密钥获取
 
@@ -20,5 +20,19 @@ clone该仓库
 git clone "your ssh url"
 ```
 
+## failed to push some refs to 'github.com:long-leo/Java-Notes.git'
 
+可能是github端仓库更新, 没有拉取
+
+```bash
+git pull origin master
+## or
+git pull [-f] origin main
+```
+
+
+
+### idea配置github
+
+[idea提交代码到github, push失败问题](https://blog.nowcoder.net/n/23ec80c20b9a4cd6bbf158bebb5ead9b?from=nowcoder_improve)
 

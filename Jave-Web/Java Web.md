@@ -500,7 +500,7 @@ function fun(thisurl){
 }
 ```
 
-#### 3.8.4close()
+#### 3.8.4 close()
 
 > 关闭窗口
 
@@ -523,93 +523,486 @@ var doc = window.opener.document;
 doc.parentform.result.value=city;
 ```
 
+## 4. XML
 
+![image-20210301121303598](Java Web.assets/image-20210301121303598.png)
 
-### 3.8 练习
+### 4.1 XML的特性
 
-emp.html
+#### 4.1.1 组成
 
-```html
-<html>
-    <head>
-        <title>ll</title>
-        <script language="JavaScript" src="check.js">
-        	
-        </script>
-    </head>
-    <form action="" method="post" name= empForm onSubmit="return check(this)">
-        雇员编号:<input type="text" name="empno" >
-        <p name="empnoError"></p><br />
-        雇员姓名:<input type="text" name="empName">
-        <p name="empnoNameError"></p><br />
-        雇员工作:<input type="text" name="job">
-        <p name="jobError"></p><br />
-        雇佣日期:<input type="text" name="date">
-        <p name="dateError"></p><br />
-        基本工资:<input type="text" name="salary">
-        <p name="salaryError"></p><br />
-        奖&nbsp;&nbsp;&nbsp;&nbsp;金:<input type="text" name="bonus">
-        <p name="bonusError"></p><br />
-        <hr />
-        <input type="submit" value="提交">
-        <input type="reset" value="重置">
-    </form>
-</html>
-```
+- 前导区
 
-<form action="" method="post">
-        雇员编号:<input type="text" name="empno" ><br />
-        雇员姓名:<input type="text" name="empName"><br />
-        雇员工作:<input type="text" name="job"><br />
-        雇佣日期:<input type="text" name="date"><br />
-        基本工资:<input type="text" name="salary"><br />
-        奖&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;金:<input type="text" name="bonus"><br />
-        <hr />
-        <input type="submit" value="提交">
-        <input type="reset" value="重置">
-    </form>
+  ```bash
+  规定XML页面的一些属性
+  version: XML版本
+  encoding: 页面使用的编码
+  standalone: 此XML文件是否独立运行, 如果需要进行显示可以使用CSS或XSL(与XPath结合使用)控制
+  
+  ## 这三个属性必须按照固定的顺序写: version, encoding, standalone
+  ```
 
-check.js
+- 数据区
 
-```js
-function check(f){
-    if (! /^\d+$/.test(f.empno)){
-        f.empnoError.value ="只能是数字";
-        f.empno.focus();
-        f.empno.select();
-        return false;
-    }
-    if (f.empName == ""){
-        f.empNameError.value ="不能为空";
-        f.empName.focus();
-        f.empName.select();
-        return false;
-    }
-    if (f.job == ""){
-        f.jobError.value ="不能为空";
-        f.job.focus();
-        f.job.select();
-        return false;
-    }
-    if (! /^\d{4}-\d{2}-\d{2}$/.test(f.date)){
-        f.dateError.value="日期格式:年-月-日, 如2021-02-28";
-        f.date.focus();
-        f.date.select();
-        return false;
-    }
-    if (! (/^\d+.\d+$/.test(f.salary) || /^\d+$/.test(f.salary) )){
-        f.salaryError.value="必须是整数或小数";
-        f.salary.focus();
-        f.salary.select();
-        return false;
-    }
-     if (! (/^\d+.\d+$/.test(f.bonus) || /^\d+$/.test(f.bonus )){
-        f.bonusError.value="必须是整数或小数";
-        f.bonus.focus();
-        f.bonus.select();
-    	return false;
-    }
-	return true;
+  ```
+  1. 必须有一个根元素
+  2. 一个根元素可以放多个子元素
+  3. 每一个元素必须完结
+  ```
+
+#### 4.1.2 XML引入CSS
+
+attrib.css
+
+```css
+name
+{
+    display:block;
+    color:blue;
+    font-size:20pt;
+    font-weight:bold;}
+id,company,email,tel,site
+{
+    display:block;
+    color:black;
+    font-size:14pt;
+    font-weight:normal;
+    font-style:italic;
 }
 ```
 
+xml_demo_03.xml
+
+```xml
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<?xml-stylesheet type="text/css" href="attrib.css"?>
+<addresslist>
+    <linkman>
+        <name>李兴华</name>
+        <id>001</id>
+        <company>魔乐科技</company>
+        <email>mldnqa@163.com</email>
+        <tel>(010)51283346</tel>
+        <site>www.MLDNJAVA.cn</site>
+    </linkman>
+</addresslist>
+```
+
+#### 4.1.3 元素还是属性
+
+> 1. 如果需要显示或者为了解析方便, 那么使用元素会更好, 属性是无法显示的
+
+#### 4.1.4  实体参照表
+
+| 实体参照 | 对应字符 |
+| -------- | -------- |
+| \&amp;   | \&       |
+| \&lt;    | <        |
+| \&gt;    | >        |
+| \&quot;  | "        |
+| \&apos;  | '        |
+
+#### 4.1.5 CDATA
+
+- 格式语法
+
+  ```
+  <![CDATA[ 不解析的内容 ]]>
+  ```
+
+#### 4.1.6 DTD/Schema
+
+```
+现在的XML文件的内容都是任意的定义的, 如果要对一个XML文件中经常出现的元素或属性进行严格定义, 需要使用DTD和Schema技术
+```
+
+
+
+### 4.2 DOM解析
+
+> DOM(Document Object Model, 文档对象模型)
+
+#### 4.2.1特点
+
+1. 随机访问
+
+2. DOM树放在了内存中
+
+   ```
+   如果文档较大或结构比较复杂, 对内存的需求就比较高, 结构复杂树的遍历也是一项耗时的操作, 对机器的性能要求较高, 程序的效率并不十分理想.
+   ```
+
+#### 4.2.2 核心操作接口
+
+- **Document**
+
+  > 提供了对文档中数据进行访问和操作的入口
+
+  1. 取得指定节点名称的NodeList
+
+     ```java
+     public NodeList getElementByTagName(String tagname);
+     ```
+
+  2. 创建一个指定名称的节点
+
+     ```java
+     public Element createElement(String tagName) throws DOMException;
+     ```
+
+  3. 创建一个文本内容节点
+
+     ```java
+     public Text createTextNode(String data)
+     ```
+
+  4. 创建一个属性
+
+     ```java
+     public Attr createAttribute(String name) throws DOMException;
+     ```
+
+- **Node**
+
+  > 每一个Node接口代表了DOM树的一个节点
+
+  ![image-20210301142109523](Java Web.assets/image-20210301142109523.png)
+
+  1. 在当前节点下增加一个新节点
+
+     ```java
+     Node appendChild(Node newChild) throws DOMException;
+     ```
+
+  2. 取得本节点下的全部字节点
+
+     ```java
+     public NodeList getChildNodes();
+     ```
+
+  3. 取得本节点下的第一个子节点
+
+     ```java
+     public Node getFirstChild();
+     ```
+
+  4. 取得本节点下的最后一个字节点
+
+     ```java
+     public Node getLastChild();
+     ```
+
+  5. 判断本节点下是否还有其他节点
+
+     ```java
+     public boolean hasChildNodes();
+     ```
+
+  6. 判断是否还有其他属性
+
+     ```java
+     public boolean hasAtrributes();
+     ```
+
+  7. 取得节点内容
+
+     ```java
+     String getNodeValue() throws DOMException;
+     ```
+
+- **NodeList**
+
+  > 表示一个节点的集合, 一般用于表示有顺序关系的一组节点
+
+  1. 取得节点的个数
+
+     ```java
+     public int getLength();
+     ```
+
+  2. 根据索引取得节点对象
+
+     ```java
+     public Node item(int index);
+     ```
+
+- **NamedNodeMap**
+
+  > 表示一组节点和其唯一名称的一一对应关系, 主要用于属性节点的表示
+
+#### 4.2.3  DOM解析读操作
+
+> 哪一个知识点和这特别像???
+
+1. 建立DocumentBuilderFactory
+
+   ```java
+   DocumentBuilderFactory factory = DocumentBuilder Factory.newInstance();
+   ```
+
+2. 建立DocumentBuilder
+
+   ```java
+   DocumentBuilder builder = factory.newDocumentBuilder();
+   ```
+
+3. 建立Document
+
+   ```java
+   Document doc = builder.parse("要读取的文件路径");
+   ```
+
+4. 建立NodeList
+
+   ```java
+   NodeList nl = doc.getElementByTagName("读取节点");
+   ```
+
+5. 进行XML信息读取
+
+   - **为什么要把NodeList中的获取的Node向下转型为Element?**
+
+   ![image-20210301150002832](Java Web.assets/image-20210301150002832.png)
+
+#### 4.2.4 DOM解析写操作
+
+1. 取得一个TransformerFactory对象
+
+   ```java
+   TransformerFactory tf = TransformFactory.newInstance();
+   ```
+
+2. 取得一个Transformer对象并设置编码
+
+   ```java
+   Transformer t = tf.newTransformer();
+   ```
+
+   ```java
+   t.setOutputProperty(OutputKeys.ENCODING, "utf-8");
+   ```
+
+3. 取得一个DOMSource对象
+
+   ```java
+   # 4.3.3 获取document实例化对象, 第三步可改为
+   Document doc = builder.newDocument();来获取空白Document对象, 
+   此对象用于DOMSource的构造参数
+   ```
+
+   ```java
+   DOMSource source = new DOMSource(doc);
+   ```
+
+4. 指定输出流对象
+
+   ```java
+   public StreamResult(File f);
+   public StreamResult(OutputStream outputStream);
+   ```
+
+5. 将XML写入指定的输出流
+
+   ```java
+   t.transform(source, result);
+   ```
+
+<img src="Java Web.assets/image-20210302233726961.png" alt="image-20210302233726961" style="zoom:50%;" />
+
+<img src="Java Web.assets/image-20210302233803375.png" alt="image-20210302233803375" style="zoom:50%;" />
+
+### 4.3 SAX解析
+
+> Simple APIs for XML
+
+#### 4.3.1 特点
+
+1. 顺序模式访问, 可以快速读取XML, 操作时会触发一系列的事件
+
+   <img src="Java Web.assets/image-20210301152327031.png" alt="image-20210301152327031" style="zoom:50%;" />
+
+2. 主要事件
+
+   - 文档开始
+
+     ```java
+     public void startDocument() throws SAXException;
+     ```
+
+   - 文档结束
+
+     ```java
+     public void endDocument() throws SAXException;
+     ```
+
+   - 元素开始
+
+     > 可以取得元素的名称及元素的全部属性
+
+     ```java
+     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException;
+     ```
+
+   - 元素结束
+
+     > 可以取得元素的名称及元素的全部属性
+
+     ```java
+     public void endElement(String uri, String localName, String qName) throws SAXException;
+     ```
+
+   - 元素内容
+
+     ```java
+     public void characters(char[] ch, int start, int length)throws SAXException;
+     ```
+
+#### 4.3.2 编写SAX解析器
+
+> 该类需要继承DefaultHandler类
+
+<img src="Java Web.assets/image-20210301153535763.png" alt="image-20210301153535763" style="zoom:50%;" />
+
+#### 4.3.3 解析XML文件
+
+1. 建立SAX解析工厂
+
+   ```java
+   SAXParserFactory factory = SAXParserFactory.newInstance();
+   ```
+
+2. 构造解析器
+
+   ```java
+   SAXParser parser = factory.newSAXParser();
+   ```
+
+3. 指定需要解析的XML文件和SAX解析器
+
+   ```java
+   parser.parse("XML file path", new MySAX())
+   ```
+
+   
+
+### 4.4  DOM与SAX解析的区别
+
+> 1. DOM适合对文件进行修改和随机存取, 不适合大型文件的操作
+> 2. SAX适合处理大型文件, 可以建立自己的对象模型
+
+![image-20210301154216185](Java Web.assets/image-20210301154216185.png)
+
+
+
+### 4.5 JDOM
+
+#### 4.5.1 主要操作类
+
+1. Document
+
+   > 定义了XML文件的各种操作
+
+2. DOMBuilder
+
+   > 用来建立JDOM结构树
+
+3. Element
+
+   > 定义了XML元素的各种操作
+
+4. Attribute
+
+   > 对元素中属性进行操作
+
+5. XMLOutputter
+
+   > 将一个JDOM结构树格式化为一个XML文件, 并指定输出对象
+
+#### 4.5.2 使用JDOM生成XML文件
+
+<img src="Java Web.assets/image-20210301160749935.png" alt="image-20210301160749935" style="zoom:50%;" />
+
+#### 4.5.2 使用JDOM读取XML文件
+
+> SAX解析方式读取
+
+![image-20210301161453878](Java Web.assets/image-20210301161453878.png)
+
+
+
+### 4.6 DOM4J
+
+#### 4.6.1 主要接口
+
+| 接口          | 描述                                                        |
+| ------------- | ----------------------------------------------------------- |
+| Attribute     | 定义了XML属性                                               |
+| Branch        | 为了包含字节点的节点, 如XML元素和文档 ,定义了一个公共的行为 |
+| CDATA         | 定义了XML CDATA区域                                         |
+| CharacterData | 标识接口, 标识基于字符的节点, 如CDATA, Comment,  Text       |
+| Comment       | 定义了XML的注释                                             |
+| Document      | 定义了XML文档                                               |
+| Element       | 定义了XML元素                                               |
+| Text          | 定义了XML文本节点                                           |
+
+#### 4.6.2 DOM4J 生成XML文件
+
+<img src="Java Web.assets/image-20210301163221815.png" alt="image-20210301163221815" style="zoom: 50%;" />
+
+<img src="Java Web.assets/image-20210301163459287.png" alt="image-20210301163459287" style="zoom:50%;" />
+
+#### 4.6.3 DOM4J解析XML文件
+
+<img src="Java Web.assets/image-20210301163624356.png" alt="image-20210301163624356" style="zoom:50%;" />
+
+
+
+### 4.7 JavaScript操作DOM
+
+#### 4.7.1 取得HTML元素并设置显示内容
+
+<img src="Java Web.assets/image-20210301171451211.png" alt="image-20210301171451211" style="zoom:50%;" />
+
+#### 4.7.2 通过DOM生成下拉列表框
+
+<img src="Java Web.assets/image-20210301171336904.png" alt="image-20210301171336904" style="zoom:50%;" />
+
+
+
+#### 4.7.3 JS动态操作表格
+
+1. 增加新的表格行
+
+   ```java
+   insertRow();
+   ```
+
+2. 删除行中指定的单元格
+
+   ```java
+   deleteCell();
+   ```
+
+3. 在一行中的指定位置插入一个空的\<td>元素
+
+   ```java
+   insertCell();
+   ```
+
+   - **使用JS提供方法进行表格操作**
+
+   <img src="Java Web.assets/image-20210301172919778.png" alt="image-20210301172919778" style="zoom:50%;" />
+
+   - **表格的DOM树**
+
+<img src="Java Web.assets/image-20210301173017206.png" alt="image-20210301173017206" style="zoom:50%;" />
+
+- **使用DOM提供的方法进行表格操作**
+
+<img src="Java Web.assets/image-20210301173538210.png" alt="image-20210301173538210" style="zoom:50%;" />
+
+<img src="Java Web.assets/image-20210301173716853.png" alt="image-20210301173716853" style="zoom:50%;" />
+
+
+
+## 4. Tomcat
