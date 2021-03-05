@@ -783,6 +783,7 @@ public static String initcap(String temp){
 > 1. static不可修饰局部变量
 > 2. static属性, 方法不依赖于对象的创建, 可以之间通过类名称访问
 > 3. static属性初始化只会执行一次
+> 4. 构造器也是一个 **static** 方法尽管它的 **static** 关键字是隐式的
 
 #### 3.13.1 static定义属性
 
@@ -842,6 +843,58 @@ public static String initcap(String temp){
 
 
 ### 3.14 代码块（分清类加载和创建对象）
+
+```java
+// reuse/Beetle.java
+// The full process of initialization
+class Insect {
+    private int i = 9;
+    protected int j;
+    
+    Insect() {
+        System.out.println("i = " + i + ", j = " + j);
+        j = 39;
+    }
+    
+    private static int x1 = printInit("static Insect.x1 initialized");
+    
+    static int printInit(String s) {
+        System.out.println(s);
+        return 47;
+    }
+}
+
+public class Beetle extends Insect {
+    private int k = printInit("Beetle.k.initialized");
+    
+    public Beetle() {
+        System.out.println("k = " + k);
+        System.out.println("j = " + j);
+    }
+    
+    private static int x2 = printInit("static Beetle.x2 initialized");
+    
+    public static void main(String[] args) {
+        System.out.println("Beetle constructor");
+        Beetle b = new Beetle();
+    }
+}
+
+```
+
+```bash
+## 结果
+static Insect.x1 initialized  (主类static想加载, 发现有父类, 父类static加载)
+static Beetle.x2 initialized (子类static加载)
+Beetle constructor (主方法输出)
+i = 9, j = 0  (new 子类构造, 去调用父类构造, 普通属性先加载,在进入父类构造)
+Beetle.k initialized (子类普通属性加载)
+k = 47  (子类构造)
+j = 39  (子类构造, 继承了父类的protected属性(或者说可以访问父类protected属性))
+
+```
+
+
 
 #### 3.14.1 没有代码块时的执行顺序
 
@@ -1042,38 +1095,46 @@ class Outer{
 
 ***
 
-- 父类与子类的关系
+#### 父类与子类的关系
 
-  - 通常，把子类对象用一个父类对象引用指向
+- 通常，把子类对象用一个父类对象引用指向
 
-    ```java
-    Father f = new Son();
-    ```
+  ```java
+  Father f = new Son();
+  ```
 
-  - 继承了父类的所有成员，同时子类可以定义新成员
+- 继承了父类的所有成员，同时子类可以定义新成员
 
 - 子类又称派生类，父类又称超类
 
-- > **限制**
+#### **限制**
 
-  - 不允许多重继承，允许多层继承
-  - **父类私有操作隐式继承，非私有操作显示继承**
-    - 比如父类定义了一个私有属性，子类要访问该私有属性，不能用“类.属性”的方式访问，只能通过setter、getter方法访问
+- 不允许多重继承，允许多层继承
+- **父类私有操作隐式继承，非私有操作显示继承**
+  - 比如父类定义了一个私有属性，子类要访问该私有属性，不能用“类.属性”的方式访问，只能通过setter、getter方法访问
 
-  - 子类对象构造默认调用父类的构造（默认无参构造）
-  - super()
-    - 如要编写，应放在构造方法的首行
-    - 调用父类无参构造
-    - 若父类没有定义无参构造，子类构造方法调用super()方法应指定参数
-  
+- 子类对象构造默认调用父类的构造（默认无参构造）
+- super()
+  - 如要编写，应放在构造方法的首行
+  - 调用父类无参构造
+  - 若父类没有定义无参构造，子类构造方法调用super()方法应指定参数
+
 - 如何合理使用继承
 
   - 对于父类private成员，子类不能直接访问，但可以通过父类setter、getter方法访问
   - 父类构造方法不能被子类继承
-
 - 子类创建过程
 
   - 先加载父类再接在子类，且父类对象的成员先初始化，即父类成员先开辟堆空间
+
+#### 使用继承设计
+
+```
+利用已有类创建新类首先选择继承的话，事情会变得莫名的复杂。
+更好的方法是首先选择组合，特别是不知道该使用哪种方法时
+```
+
+
 
 ### 4.2 **关于super()和this()**
 
@@ -1099,7 +1160,7 @@ class Outer{
 
 - 子类方法覆写后，若希望调用父类的方法，可用**super.覆写方法()**来访问
 
-- 子类覆写父类方法的返回值
+- 子类覆写父类方法的返回值(在重写的时候，重写方法的返回值类型可以是被重写方法返回值类型的子类。)
 
   |     父类     |             子类             |
   | :----------: | :--------------------------: |
@@ -1136,16 +1197,17 @@ class Outer{
 - final定义的静态常量
   - 访问基本数据常量不会触发类加载
   - 访问除了String类型的引用数据常量会触发类加载
+- 类中所有的 **private** 方法都隐式地指定为 **final**
 
 ### 4.6 多态性
 
-***
+> 任何属性访问都被编译器解析，因此不是多态的, 只有普通方法才具有多态性
 
-> **方法多态性**
+#### 方法多态性
 
 - 重载与覆写
 
-> **对象多态性**  
+#### 对象多态性
 
 - 父子类对象的转换
 - 向上转型：自动转换（父类  父类对象  =  子类实例），使参数统一
@@ -1154,106 +1216,449 @@ class Outer{
 - 向下转型：强制转换  （子类  子类对象 =  （子类）父类实例），调用子类的个性化操作方法
   - 必须发生子类向上转型才可以进行向下转型（对应抽象类和接口，必须有子类才行），直接定义一个父类向子类转换，程序会报错，此时可以调用子类私有的方法了
 
-> **instanceof**
+#### instanceof
 
 - 对象  instanceof  类    返回boolean值
 - 向下转型前建议都使用instanceof判断
+
+#### 多态在代码上的表现
+
+代码1: 普通方法可以实现多态
+
+```java
+// polymorphism/music3/Music3.java
+// An extensible program
+// {java polymorphism.music3.Music3}
+package polymorphism.music3;
+import polymorphism.music.Note;
+
+class Instrument {
+    void play(Note n) {
+        System.out.println("Instrument.play() " + n);
+    }
+    
+    String what() {
+        return "Instrument";
+    }
+    
+    void adjust() {
+        System.out.println("Adjusting Instrument");
+    }
+}
+
+class Wind extends Instrument {
+    @Override
+    void play(Note n) {
+        System.out.println("Wind.play() " + n);
+    }
+    @Override
+    String what() {
+        return "Wind";
+    }
+    @Override
+    void adjust() {
+        System.out.println("Adjusting Wind");
+    }
+}
+
+class Percussion extends Instrument {
+    @Override
+    void play(Note n) {
+        System.out.println("Percussion.play() " + n);
+    }
+    @Override
+    String what() {
+        return "Percussion";
+    }
+    @Override
+    void adjust() {
+        System.out.println("Adjusting Percussion");
+    }
+}
+
+class Stringed extends Instrument {
+    @Override
+    void play(Note n) {
+        System.out.println("Stringed.play() " + n);
+    } 
+    @Override
+    String what() {
+        return "Stringed";
+    }
+    @Override
+    void adjust() {
+        System.out.println("Adjusting Stringed");
+    }
+}
+
+class Brass extends Wind {
+    @Override
+    void play(Note n) {
+        System.out.println("Brass.play() " + n);
+    }
+    @Override
+    void adjust() {
+        System.out.println("Adjusting Brass");
+    }
+}
+
+class Woodwind extends Wind {
+    @Override
+    void play(Note n) {
+        System.out.println("Woodwind.play() " + n);
+    }
+    @Override
+    String what() {
+        return "Woodwind";
+    }
+}
+
+public class Music3 {
+    // Doesn't care about type, so new types
+    // added to the system still work right:
+    public static void tune(Instrument i) {
+        // ...
+        i.play(Note.MIDDLE_C);
+    }
+    
+    public static void tuneAll(Instrument[] e) {
+        for (Instrument i: e) {
+            tune(i);
+        }
+    }
+    
+    public static void main(String[] args) {
+        // Upcasting during addition to the array:
+        Instrument[] orchestra = {
+            new Wind(),
+            new Percussion(),
+            new Stringed(),
+            new Brass(),
+            new Woodwind()
+        };
+        tuneAll(orchestra);
+    }
+}
+
+```
+
+代码1的输出
+
+```
+Wind.play() MIDDLE_C
+Percussion.play() MIDDLE_C
+Stringed.play() MIDDLE_C
+Brass.play() MIDDLE_C
+Woodwind.play() MIDDLE_C
+```
+
+代码2: 属性无法体现多态性
+
+```java
+// polymorphism/FieldAccess.java
+// Direct field access is determined at compile time
+class Super {
+    public int field = 0;
+    
+    public int getField() {
+        return field;
+    }
+}
+
+class Sub extends Super {
+    public int field = 1;
+    
+    @Override
+    public int getField() {
+        return field;
+    }
+    
+    public int getSuperField() {
+        return super.field;
+    }
+}
+
+public class FieldAccess {
+    public static void main(String[] args) {
+        Super sup = new Sub(); // Upcast
+        System.out.println("sup.field = " + sup.field + 
+                          ", sup.getField() = " + sup.getField());
+        Sub sub = new Sub();
+        System.out.println("sub.field = " + sub.field + 
+                          ", sub.getField() = " + sub.getField()
+                          + ", sub.getSuperField() = " + sub.getSuperField())
+    }
+}
+```
+
+代码2的输出
+
+```
+sup.field = 0, sup.getField() = 1
+sub.field = 1, sub.getField() = 1, sub.getSuperField() = 0
+```
+
+#### 继承与清理
+
+```
+层级结构中的每个类都有 Characteristic 和 Description 两个类型的成员对象，它们必须得被销毁。销毁的顺序应该与初始化的顺序相反，以防一个对象依赖另一个对象。对于属性来说，就意味着与声明的顺序相反（因为属性是按照声明顺序初始化的）。对于基类（遵循 C++ 析构函数的形式），首先进行派生类的清理工作，然后才是基类的清理。这是因为派生类的清理可能调用基类的一些方法，所以基类组件这时得存活，不能过早地被销毁。输出显示了，Frog 对象的所有部分都是按照创建的逆序销毁的。
+```
+
+```java
+// polymorphism/Frog.java
+// Cleanup and inheritance
+// {java polymorphism.Frog}
+package polymorphism;
+
+class Characteristic {
+    private String s;
+    
+    Characteristic(String s) {
+        this.s = s;
+        System.out.println("Creating Characteristic " + s);
+    }
+    
+    protected void dispose() {
+        System.out.println("disposing Characteristic " + s);
+    }
+}
+
+class Description {
+    private String s;
+    
+    Description(String s) {
+        this.s = s;
+        System.out.println("Creating Description " + s);
+    }
+    
+    protected void dispose() {
+        System.out.println("disposing Description " + s);
+    }
+}
+
+class LivingCreature {
+    private Characteristic p = new Characteristic("is alive");
+    private Description t = new Description("Basic Living Creature");
+    
+    LivingCreature() {
+        System.out.println("LivingCreature()");
+    }
+    
+    protected void dispose() {
+        System.out.println("LivingCreature dispose");
+        t.dispose();
+        p.dispose();
+    }
+}
+
+class Animal extends LivingCreature {
+    private Characteristic p = new Characteristic("has heart");
+    private Description t = new Description("Animal not Vegetable");
+    
+    Animal() {
+        System.out.println("Animal()");
+    }
+    
+    @Override
+    protected void dispose() {
+        System.out.println("Animal dispose");
+        t.dispose();
+        p.dispose();
+        super.dispose();
+    }
+}
+
+class Amphibian extends Animal {
+    private Characteristic p = new Characteristic("can live in water");
+    private Description t = new Description("Both water and land");
+    
+    Amphibian() {
+        System.out.println("Amphibian()");
+    }
+    
+    @Override
+    protected void dispose() {
+        System.out.println("Amphibian dispose");
+        t.dispose();
+        p.dispose();
+        super.dispose();
+    }
+}
+
+public class Frog extends Amphibian {
+    private Characteristic p = new Characteristic("Croaks");
+    private Description t = new Description("Eats Bugs");
+    
+    public Frog() {
+        System.out.println("Frog()");
+    }
+    
+    @Override
+    protected void dispose() {
+        System.out.println("Frog dispose");
+        t.dispose();
+        p.dispose();
+        super.dispose();
+    }
+    
+    public static void main(String[] args) {
+        Frog frog = new Frog();
+        System.out.println("Bye!");
+        frog.dispose();
+    }
+}
+```
+
+#### 构造器使用规范
+
+```
+做尽量少的事让对象进入良好状态。如果有可能的话，尽量不要调用类中的任何方法。在基类的构造器中能安全调用的只有基类的 final 方法（这也适用于可被看作是 final 的 private 方法）。这些方法不能被重写，因此不会产生意想不到的结果。你可能无法永远遵循这条规范，但应该朝着它努力。
+```
+
+
+
+
 
 ### 4.7 抽象类
 
 ***
 
-> **特点**
+#### 特点
 
-- 抽象类不能**直接实例化**对象
-  - 抽象类的子类通过向上转型可以给抽象类实例化
-- 必须有子类，**子类必须覆写抽象方法**
+1. 抽象类不能**直接实例化**对象
 
-- **抽象类除了abstract关键字和抽象方法，其他组成与普通类一致**
-  
+2. 抽象类的子类通过向上转型可以给抽象类实例化
 
-> **原则**
+3. 继承抽象类的子类可以不复写抽象方法, 但是该子类依然是一个抽象类, 要变为普通类, 则子类必须覆写抽象方法
 
-- 实际开发中，应继承一个抽象类而不是一个普通类
+4. 抽象类除了abstract关键字和抽象方法，**其他组成与普通类一致**
+5. 可以将一个类声明为抽象类使之不能实例化对象
 
-- 抽象类命名规范
+#### 原则
 
-  ```java
-  abstract class AbstractName{}
-  ```
+1. 实际开发中，应继承一个抽象类而不是一个普通类
 
-> **抽象方法**
+2. 抽象类命名规范
 
-- 不可以用static修饰abstract方法
-  - static修饰的方法不可以被覆写
+   ```java
+   abstract class AbstractName{}
+   ```
 
-> **相关限制**
+#### 抽象方法
 
-- 子类实例化时，仍先执行父类构造，再调用子类构造
-- **抽象类不能用final定义**
-- 可以没有抽象方法
-- 抽象类中可以定义内部抽象类，子类可根据需要决定是否继承抽象内部类
-- 外部抽象类不允许static声明，但内部抽象类可以，static声明的内部抽象类，相当于外部抽象类
-- 抽象类虽然不能实例化，但是static属性和方法，可以在没有对象的时候调用
+1. 不可以用static修饰abstract方法
+   - static修饰的方法不可以被覆写
+2. 不可以定义private的abstract方法
 
-> **隐藏抽象子类**
+#### 相关说明
 
-![image-20210124194014272](Java基础.assets/image-20210124194014272.png)
+1. 子类实例化时，仍先执行父类构造，再调用子类构造
+
+2. 抽象类不能用final定义
+
+3. 可以没有抽象方法
+
+4. 抽象类中可以定义内部抽象类，子类可根据需要决定是否继承抽象内部类
+
+4. **外部抽象类不允许static声明，但内部抽象类可以，static声明的内部抽象类，相当于外部抽象类**
+
+5. 抽象类虽然不能实例化，但是static属性和方法，可以在没有对象的时候调用
+
+#### 隐藏抽象子类
+
+```
+利用static可以在抽象类中定义不受实例化对象限制的方法, 现在抽象类只需要一个特定的系统子类操作, 那么就可以通过内部类的方式来定义抽象类的子类, 这样的设计在系统类库中比较常见, 目的是为用户隐藏不需要知道的子类
+```
+
+```java
+abstract class A{
+	public abstract void print();
+    
+    // 内部抽象子类
+    private static class B extends A{
+        public void print(){
+            System.out.println("HelloWOrld!");
+        }
+    }
+    public static A getInstance(){
+        return new B();
+    }
+}
+
+public class TestDemo{
+    public static void main(String[] args){
+        // 此时取得抽象类对象不需要知道B类这个子类存在
+        A a = A.newInstance();
+        a.print();
+    }
+}
+```
 
 
 
 ### 4.8 方法定义原则
 
-***
+1. 开发中大多数都是采用public定义方法
 
-- 开发中大多数都是采用public定义方法
+
 
 ### 4.9 接口
 
-***
+>  解决抽象类继承只能单继承的问题
 
-> **解决抽象类继承只能单继承的问题**
+#### 特点
 
-#### 4.9.1特点
+1. 仅由抽象方法和全局常量组成 （JDK1.8前）
 
-- 仅由抽象方法和全局常量组成 （JDK1.8之后接口可以定义更多操作）
-  - 可添加default方法：在需要给接口添加新的功能，但是这个接口有很多实现类，添加default方法只需要在实现的子类中覆写即可
-  - 可添加public static 方法
-- interface关键字定义接口
+2. JDK1.8之后
 
-#### 4.9.2使用原则
+   - 可添加default方法：
 
-- 必须有子类，可用implements关键字实现多个接口，避免单继承的局限
-- 如果子类不是抽象类，则必须覆写全部抽象方法
-- 接口对象可利用子类对象向上转型进行实例化操作
-  - 若X  implements A， B，则X的实例化对象也是A、B接口的实例化对象，instanceof判断为true
+     ```
+     在需要给一个接口添加新的功能时, 如果这个接口有很多实现类，那么添加default方法只需要在需要该方法子类中覆写即可, 其他子类不强制覆写该方法
+     ```
 
-#### 4.9.3 接口简化定义
+   - 可添加static 方法
 
-- **interface 默认是public修饰的, 故interface与public interface是一致的**
+3. 若X  implements A， B，则X的实例化对象也是A、B接口的实例化对象，instanceof判断为true
 
-- 接口中的方法权限**只能是public**
-- 简化写法
-  - **abstract省略**
-  - **public static final省略l**
+4. 接口中可定义普通内部类、抽象内部类、内部接口
 
-> **要继承抽象类，又要实现接口**
+   ```
+   static定义一个内部接口，那么这个接口就变成了外部接口
+   ```
 
-- 先继承（extends）后实现接口（implement）
+#### 使用原则
 
-> **接口继承**
+1. 必须有子类，可用implements关键字实现多个接口，避免单继承的局限
 
-- 一个接口可以继承（extends）多个接口
+2. 如果子类不是抽象类，则必须覆写全部抽象方法
 
-> **接口中可定义普通内部类、抽象内部类、内部接口**
+3. 接口对象可利用子类对象向上转型进行实例化操作
 
-- static定义一个内部接口，那么这个接口就变成了外部接口
+#### 接口简化定义
 
-> **接口功能**
+接口中的方法修饰是public abstract
+
+属性定义可以默认是static final
+
+- **简化写法**
+  - abstract省略
+  - public static final省略
+
+#### 接口继承
+
+```
+一个接口可以继承（extends）多个接口
+```
+
+#### 接口功能
 
 - 定义不同层之间的操作标准
 - 表示一种操作能力
 - 将服务器读入的远程方法视图暴露给客户端：分布式开发
+
+
 
 ### 4.10 接口应用：工厂设计模式
 
@@ -1271,7 +1676,7 @@ class Outer{
 
 ### 4.12接口与抽象类
 
-***
+1. 接口的典型使用是代表一个类的类型或一个形容词，如 Runnable 或 Serializable，而抽象类通常是类层次结构的一部分或一件事物的类型，如 String 或 ActionHero。
 
 > **优先考虑接口**
 
@@ -1502,6 +1907,69 @@ class Outer{
 | 修饰方法内部局部变量 |                           局部常量                           |     <font color='red'>x</font>     |
 | 用途                 | 1) 为了防止方法被覆盖或改写  <br>2).提高运行效率，JAVA对final方法调用采用内嵌机制 |    1）定义属性<br>2)定义类方法     |
 
+### Java中的委托
+
+>  **DerivedSpaceShip** 并不是真正的“一种” **SpaceShipControls** ，即使你“告诉” **DerivedSpaceShip** 调用 `forward()`。更准确地说，一艘宇宙飞船包含了 **SpaceShipControls**，同时 **SpaceShipControls** 中的所有方法都暴露在宇宙飞船中。委托解决了这个难题:
+
+```java
+// reuse/SpaceShipControls.java
+// (c)2017 MindView LLC: see Copyright.txt
+// We make no guarantees that this code is fit for any purpose.
+// Visit http://OnJava8.com for more book information.
+
+public class SpaceShipControls {
+  void up(int velocity) {}
+  void down(int velocity) {}
+  void left(int velocity) {}
+  void right(int velocity) {}
+  void forward(int velocity) {}
+  void back(int velocity) {}
+  void turboBoost() {}
+}
+```
+
+```java
+// reuse/SpaceShipDelegation.java
+// (c)2017 MindView LLC: see Copyright.txt
+// We make no guarantees that this code is fit for any purpose.
+// Visit http://OnJava8.com for more book information.
+
+public class SpaceShipDelegation {
+  private String name;
+  private SpaceShipControls controls =
+    new SpaceShipControls();
+  public SpaceShipDelegation(String name) {
+    this.name = name;
+  }
+  // Delegated methods:
+  public void back(int velocity) {
+    controls.back(velocity);
+  }
+  public void down(int velocity) {
+    controls.down(velocity);
+  }
+  public void forward(int velocity) {
+    controls.forward(velocity);
+  }
+  public void left(int velocity) {
+    controls.left(velocity);
+  }
+  public void right(int velocity) {
+    controls.right(velocity);
+  }
+  public void turboBoost() {
+    controls.turboBoost();
+  }
+  public void up(int velocity) {
+    controls.up(velocity);
+  }
+  public static void main(String[] args) {
+    SpaceShipDelegation protector =
+      new SpaceShipDelegation("NSEA Protector");
+    protector.forward(100);
+  }
+}
+```
 
 ### 4.19 面试题
 
@@ -1559,7 +2027,7 @@ class Outer{
 
 #### 5.2.2 jar命令
 
-![image-20210223180338438](D:\LiaoLong\Documents\Java\笔记\Java基础.assets\image-20210223180338438.png)
+![image-20210223180338438](Java基础.assets\image-20210223180338438.png)
 
 - 常用参数
   - -c :   创建一个新文件
@@ -1583,19 +2051,56 @@ class Outer{
 
 ### 5.3 访问控制权限
 
-- 4中访问控制权限
+> 一个类如果如果有被继承的需要,  为了允许继承，一般规则是所有字段设置为私有，所有方法设置为公共。
 
-  ![image-20210127215459004](Java基础.assets/image-20210127215459004.png)
+#### 5.3.1  4种访问控制权限
+
+| 范围           | private | default | protected | public |
+| -------------- | ------- | ------- | --------- | ------ |
+| 同一包的同一类 | 可以    | 可以    | 可以      | 可以   |
+| 同一包的不同类 |         | 可以    | 可以      | 可以   |
+| 不同包的子类   |         |         | 可以      | 可以   |
+| 不同包的非子类 |         |         |           | 可以   |
+
+#### 5.3.2  关于细节
+
+- private
   
-- 同包下，protected、默认权限随意访问
+1. **只能在一个类中访问**
 
-- 不同包非子类，protected、默认权限不能访问
+- default(或者不声明权限)
+  
+1. **包访问权限,** 当前包中的所有其他类都可以访问那个成员
 
-- 在不同包，对于protected，要想访问
+- protected
 
-  - 1、在本子类中创建自身子类对象，其他均不可以
-  - 也就是说，对于protected属性，在不同包，在一个子类中去创建另一个子类对象，是不可以访问另一个包下的protected方法
-  - 子类可以重写父类的protected属性
+  1. **在与父类不同包的子类中, 可以访问到父类**
+
+  2. 说明
+
+     ```
+     在本子类中创建自身子类对象，可以访问位于不同包的父类, 其他形式均不可以, 
+     
+     也就是说，对于protected属性，在不同包，在一个子类中去创建另一个子类对象，是不可以访问另一个包下的protected方法的
+     ```
+
+  3. 子类可以重写父类的protected属性方法
+
+- public
+
+  1. **所有都可以**
+
+#### 5.3.3 public 和包访问权限
+
+> 下面这个类具有默认访问权限(包访问权限), 构造方法确使public的, 这个public是没有用的, 在包外是不可以调用这个构造器的
+
+```java
+package hiding.packageaccess;
+
+class PublicConstructor {
+    public PublicConstructor() {}
+}
+```
 
 ### 5.4 单例设计模式
 
@@ -1829,8 +2334,9 @@ public class NewVarArgs {
 
 - 传入多个参数,  这些参数统一被**转换为参数类型的一个数组**
 - 如果传入的一个参数, **该参数本身就是一个数组, 编译器不会执行转换**
-
 - 可变参数应该放在方法参数列表的最后面
+
+
 
 ### 8.4 泛型
 
@@ -1838,81 +2344,107 @@ public class NewVarArgs {
 
 #### 8.4.1 泛型类
 
-> 1. 在实例化类对象时, 不设置泛型, 则泛型类型默认为Object类
-> 2. 设置泛型, 类中有泛型标记的, 将会动态设置类型
-> 3. 泛型类型只能是类, 不可以是基本类型, 只能是引用类型
-> 4. 泛型是针对一个类的属性类型的,   通配符是针对运用了泛型的类的对象之间的引用传递或者说是参数传递问题
+```bash
+1. 在实例化类对象时, 不设置泛型, 则泛型类型 `默认为Object类`
+2. 设置泛型, 类中有泛型标记的, 将会动态设置类型
+3. 泛型类型只能是类, 不可以是基本类型, `只能是引用类型`
+4. 泛型是`针对一个类的属性类型的`, 通配符是针对运用了泛型的类的对象之间的引用传递或者说是参数传递问题
+```
 
-- 定义
+定义
 
-  ```java
-  // 一个泛型标记
-  class Point<T>{
-      private T x;
-      private T y;
-      // ...
-  }
-  
-  // 多个泛型标记
-  class Point<P, R>{
-      public R fun(P p){
-          return null;
-      }
-  }
-  ```
+```
+需要注意的是,泛型类设计时, 泛型个数尽量只定义1-2个, 不要定义多个泛型
+```
 
-- 以下实例化方式也合法
+```java
+// 一个泛型标记
+class Point<T>{
+    private T x;
+    private T y;
+    // ...
+}
 
-  ```java
-  Point<Integer> p = new Point<>();
-  ```
+// 多个泛型标记
+class Point<P, R>{
+    public R fun(P p){
+        return null;
+    }
+}
+```
 
-  
+以下实例化方式也合法
+
+```java
+Point<Integer> p = new Point<>();
+```
+
+
 
 #### 8.4.2 通配符 ?
 
 > 1. 泛型是针对一个类的属性类型的,   通配符是针对运用了泛型的类的对象之间的引用传递或者说是参数传递问题
-> 2. 对于一个方法的重载, 只要求参数类型不同, 但是没有对泛型类型有任何的要求
+> 2. 对于一个**方法的重载, 只要求参数类型不同, 但是没有对泛型类型没有任何的要求**
+> 3. 泛型的通配符时为了模拟数组协变, 同时防止了协变数组中不好的地方
 
-- 示例代码 
+数组协变
+
+```java
+A[] a1 = new A[];
+B[] b1 = new B[];
+
+// 此处发生了协变
+a1 = b1;
+
+class A{
+    
+}
+class B extends A{
+    
+}
+```
+
+
+
+示例代码 
+
+```java
+Message<Integer> m1 = new Message<Integer>;
+Message<String> m2 = new Messgae<Integer>;
+fun(m1);
+fun(m2);
+      
+public static void fun(Message<?> temp)){
+    System.out.println(temp.getMsg());
+}
+```
+**注意**
+
+```bash
+泛型类型中的类是没有继承的概念范畴的, 
+即如Message<Integer>和Message<Object>属于两个完全独立的概念, 
+示例代码中的fun()改为fun(Message temp)即不指定泛型类型,那么此时
+传入的Message对象是泛型类型是Object类, 那么改对象中的属性就可以
+随意更改(就是没有了指定泛型类型的约束, 在给属性赋值一个与实际对象的类型不一致的类型, 此时程序并不会报错, 存在逻辑错误)
+```
+
+子通配符
+
+- 设置泛型上限
 
   ```java
-  Message<Integer> m1 = new Message<Integer>;
-  Message<String> m2 = new Messgae<Integer>;
-  fun(m1);
-  fun(m2);
-        
-  public static void fun(Message<?> temp)){
-      System.out.println(temp.getMsg());
-  }
+  // 类是上限
+  ? extends 类
   ```
-  - **注意**
 
-    ```bash
-    泛型类型中的类是没有继承的概念范畴的, 
-    即如Message<Integer>和Message<Object>属于两个完全独立的概念, 
-    示例代码中的fun()改为fun(Message temp)即不指定泛型类型,那么此时
-    传入的Message对象是泛型类型是Object类, 那么改对象中的属性就可以
-    随意更改(就是没有了指定泛型类型的约束, 在给属性赋值一个与实际对象的类型不一致的类型, 此时程序并不会报错, 存在逻辑错误)
-    ```
+- 设置泛型下限
 
-- 子通配符
+  ```java
+  // 类是下限
+  ? super 类
+  ```
 
-  - 设置泛型上限
-
-    ```java
-    // 类是上限
-    ? extends 类
-    ```
-
-  - 设置泛型下限
-
-    ```java
-    // 类是下限
-    ? super 类
-    ```
-
-#### 8.4.3 泛型接口
+#### 8.4.3 泛型接口及其子类
 
 ```java
 interface IMessage<T>{
@@ -1920,34 +2452,75 @@ interface IMessage<T>{
 }
 ```
 
-- 泛型接口子类设置泛型, 子类实例化对象时设置泛型
+泛型接口**子类设置泛型**, 子类实例化对象时设置泛型
 
-  ```java
-  class MessageImpl<S> implements IMessage<S>{
-      public void(S t){
-          System.out.println(t);
-      }
-  }
-  ```
+```java
+// 设置泛型, 但是不指定泛型类型
+class MessageImpl<S> implements IMessage<S>{
+    public void(S t){
+        System.out.println(t);
+    }
+}
 
-- 泛型接口子类不设置泛型, 子类实例化对象时不需要设置泛型了
+// 这里时指定泛型类型时Object类型, 此时实例化时不可以指定泛型类型
+class Message implements IMeassage{
+    
+}
 
-  ```java
-  class MessageImpl implements IMessage<String>{
-      public void(String t){
-          System.out.println(t);
-      }
-  }
-  ```
+// 指定泛型为String类型
+class Messag3<T> implements IMessage<String>{
+    
+}
 
-  
+```
+
+泛型接口子类不设置泛型, 子类实例化对象时不需要设置泛型了
+
+```java
+class MessageImpl implements IMessage<String>{
+    public void(String t){
+        System.out.println(t);
+    }
+}
+```
+
+
 
 #### 8.4.4 泛型方法
 
-> 不一定非要在泛型类中定义泛型方法
+> 不一定非要在泛型类中定义泛型方法, 但单独定义泛型方法比较少用
 
 ```java
+// public <泛型类型>  返回类型 方法名();
 public static <T> T fun(T t);
+
+```
+
+#### 泛型擦除
+
+```
+Java泛型其实是"伪泛型", 在底层实现时, 会把泛型擦除, 转为Object类, JVM帮我们记住具体Object类向下转型时所对应的准确的类型, 此时就可以保证在编译时发现类型不匹配的问题,
+```
+
+这也是Java的设计思想: **尽量把运行时异常转换为编译时异常**
+
+![image-20210305093504785](Java基础.assets/image-20210305093504785.png)
+
+#### 好处
+
+   a. 提高了程序的安全性
+
+   b. 将运行期遇到的问题转移到了编译期
+
+   c. 省去了类型强转的麻烦
+
+#### 常用泛型名字
+
+```
+T     type
+E     element
+K     key
+V     value
 ```
 
 
@@ -1955,15 +2528,112 @@ public static <T> T fun(T t);
 ### 8.5 枚举
 
 > 1. 枚举类型的实例是常量，因此按照命名惯例，它们都用大写字母表示
+> 2. 覆写了toString方法
+> 3. 使用enum声明枚举, 声明的枚举类型默认继承了Enum类, 该类是一个抽象类
+> 4. 枚举实际是是一个简化版的多例设计模式
 
 ```java
+public abstract class Enum<E extends Enum<E>> extends Object
+implements Comparable<E>, Serializable
+
+    
 enum Color{
     RED, GREEN, BULE;
 }
 ```
+#### API
+
+1. 返回enum常量声明顺序
+
+   ```java
+   public final int ordinal();
+   ```
+
+2. 构造
+
+   ```java
+   protected Enum(String name,, int ordinal);
+   ```
+
+3. 返回枚举对象名字
+
+   ```java
+   public final String name();
+   ```
+
+4. static 方法, 按照枚举常量声明顺序, 生成这些常量值构成的数组
+
+   ```
+   values()
+   ```
+
+#### 示例代码
+
+遍历枚举
+
+```java
+public class EnumOrder {
+    public static void main(String[] args) {
+        for (Spiciness s: Spiciness.values()) {
+            System.out.println(s + ", ordinal " + s.ordinal());
+        }
+    }
+}
+
+enum Spiciness {
+    NOT, MILD, MEDIUM, HOT, FLAMING
+}
+
+// 输出 
+NOT, ordinal 0
+MILD, ordinal 1
+MEDIUM, ordinal 2
+HOT, ordinal 3
+FLAMING, ordinal 4   
+```
+
+在switch中使用
+
+```java
+public class Burrito {
+    Spiciness degree;
+    
+    public Burrito(Spiciness degree) {
+        this.degree = degree;
+    }
+    
+    public void describe() {
+        System.out.print("This burrito is ");
+        switch(degree) {
+            case NOT:
+                System.out.println("not spicy at all.");
+                break;
+            case MILD:
+            case MEDIUM:
+                System.out.println("a little hot.");
+                break;
+            case HOT:
+            case FLAMING:
+            default:
+                System.out.println("maybe too hot");
+        }
+    }
+    
+    public static void main(String[] args) {
+        Burrito plain = new Burrito(Spiciness.NOT),
+        greenChile = new Burrito(Spiciness.MEDIUM),
+        jalapeno = new Burrito(Spiciness.HOT);
+        plain.describe();
+        greenChile.describe();
+        jalapeno.describe();
+    }
+}
+```
+
+
+
 #### 作用
 
-- 简化多例设计模式
 - 枚举对象必须在首行
 - 构造方法不能用public声明
 - 可定义匿名内部类、抽象类等
@@ -3388,6 +4058,8 @@ public int nextInt(int bound)  //产生一个不大于指定边界的随机整�
   ```
 
 - Comparable接口 （优先考虑）
+
+  ![image-20210305174310981](Java基础.assets/image-20210305174310981.png)
 
   - Arrays类中可用sort() 方法对实现了Comparable接口的类的对象数组排序
 

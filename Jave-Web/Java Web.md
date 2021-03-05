@@ -1005,4 +1005,86 @@ xml_demo_03.xml
 
 
 
-## 4. Tomcat
+## Tomcat
+
+### Web容器
+
+> 1. html, htm之类的一般属于静态请求, jsp, php之类的一般是动态请求
+> 2. 静态请求的所以代码都是固定的, 而动态请求的所有代码都是拼凑而成的
+
+![image-20210303215857049](Java Web.assets/image-20210303215857049.png)
+
+### Tomcat
+
+#### 主要目录的作用
+
+![image-20210303223907838](Java Web.assets/image-20210303223907838.png)
+
+![image-20210303223922955](Java Web.assets/image-20210303223922955.png)
+
+## servlet
+
+### servlet简介
+
+![image-20210305193136214](Java Web.assets/image-20210305193136214.png)
+
+![image-20210305193322394](Java Web.assets/image-20210305193322394.png)
+
+
+
+![image-20210305201218667](Java Web.assets/image-20210305201218667.png)
+
+
+
+![image-20210305203731252](Java Web.assets/image-20210305203731252.png)
+
+#### 编写简单的HelloServlet程序
+
+1.Servlet  java程序
+
+```java
+package com.liaolong.servlet;
+
+import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+/**
+ * @author coderliaolong@outlook.com
+ * @date 2021/3/5 20:40
+ */
+public class HelloServlet extends HttpServlet {
+
+    // 由于get或者post只是请求实现的方式不同, 可以互相调用, 业务逻辑都一样
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        ServletInputStream inputStream = req.getInputStream();
+        // ServletOutputStream outputStream = resp.getOutputStream();
+        PrintWriter writer = resp.getWriter();
+
+        writer.print("Hello, Servlet!");
+
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doGet(req, resp);
+    }
+}
+```
+
+2.编写servlet映射
+
+![image-20210305205350590](Java Web.assets/image-20210305205350590.png)
+
+### Servlet原理
+
+servlet 由web容器调用, 可以实现, web服务器在收到浏览器请求后, 会: 
+
+![image-20210305165343525](Java Web.assets/image-20210305165343525.png)
