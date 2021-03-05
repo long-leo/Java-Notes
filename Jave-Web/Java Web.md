@@ -1079,7 +1079,7 @@ public class HelloServlet extends HttpServlet {
 }
 ```
 
-2.编写servlet映射
+2.编写servlet映射 
 
 ![image-20210305205350590](Java Web.assets/image-20210305205350590.png)
 
