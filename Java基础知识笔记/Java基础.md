@@ -1594,7 +1594,7 @@ public class TestDemo{
 }
 ```
 
-
+`c`c
 
 ### 4.8 方法定义原则
 
@@ -1612,13 +1612,231 @@ public class TestDemo{
 
 2. JDK1.8之后
 
-   - 可添加default方法：
+   - **可添加default方法：(又称为守卫方法或虚拟扩展方法)**
+
+     ```bash
+     `这里的default方法是有关键字default的,` 在需要给一个接口添加新的功能时, 如果这个接口有很多实现类，那么在接口中添加的default方法可以定义方法题, 子类不强制覆写该方法, 实现该接口的子类可以调用该方法
+     ```
+
+     ```java
+     // interfaces/Implementation2.java
+     public class Implementation2 implements InterfaceWithDefault {
+         @Override
+         public void firstMethod() {
+             System.out.println("firstMethod");
+         }
+         
+         @Override
+         public void secondMethod() {
+             System.out.println("secondMethod")
+         }
+         
+         public static void main(String[] args) {
+             InterfaceWithDefault i = new Implementation2();
+             i.firstMethod();
+             i.secondMethod();
+             i.newMethod();
+         }
+     }
+     
+     
+     // 输出结果
+     firstMethod
+     secondMethod
+     newMethod	
+     ```
 
      ```
-     在需要给一个接口添加新的功能时, 如果这个接口有很多实现类，那么添加default方法只需要在需要该方法子类中覆写即可, 其他子类不强制覆写该方法
+     这里子类实现了多个接口, 当多个接口中有方法签名一致的defalut方法, 在子类需要覆写该方法以指定调用哪一个方法, 注意调用接口default方法的方式
      ```
 
-   - 可添加static 方法
+     ```java
+     // interfaces/Jim.java
+     import java.util.*;
+     
+     interface Jim1 {
+         default void jim() {
+             System.out.println("Jim1::jim");
+         }
+     }
+     
+     interface Jim2 {
+         default void jim() {
+             System.out.println("Jim2::jim");
+         }
+     }
+     
+     public class Jim implements Jim1, Jim2 {
+         @Override
+         public void jim() {
+             Jim2.super.jim();
+         }
+         
+         public static void main(String[] args) {
+             new Jim().jim();
+         }
+     }
+     
+     // 输出结果
+     Jim2::jim  
+     ```
+
+   - **可添加static 方法**
+
+     ```
+     模板设计模式
+     ```
+
+     ```java
+     // onjava/Operations.java
+     package onjava;
+     import java.util.*;
+     
+     public interface Operations {
+         void execute();
+         
+         static void runOps(Operations... ops) {
+             for (Operations op: ops) {
+                 op.execute();
+             }
+         }
+         
+         static void show(String msg) {
+             System.out.println(msg);
+         }
+     }
+     ```
+
+     ```java
+     // interface/Machine.java
+     import java.util.*;
+     import onjava.Operations;
+     
+     class Bing implements Operations {
+         @Override
+         public void execute() {
+             Operations.show("Bing");
+         }
+     }
+     
+     class Crack implements Operations {
+         @Override
+         public void execute() {
+             Operations.show("Crack");
+         }
+     }
+     
+     class Twist implements Operations {
+         @Override
+         public void execute() {
+             Operations.show("Twist");
+         }
+     }
+     
+     public class Machine {
+         public static void main(String[] args) {
+             Operations.runOps(
+                 new Bing(), new Crack(), new Twist());
+         }
+     }
+     ```
+
+     ```java
+     // 输出结果
+     Bing
+     Crack
+     Twist
+     ```
+
+     ```java
+     // interfaces/music5/Music5.java
+     // {java interfaces.music5.Music5}
+     package interfaces.music5;
+     import polymorphism.music.Note;
+     
+     interface Instrument {
+         // Compile-time constant:
+         int VALUE = 5; // static & final
+         
+         default void play(Note n)  // Automatically public 
+             System.out.println(this + ".play() " + n);
+         }
+         
+         default void adjust() {
+             System.out.println("Adjusting " + this);
+         }
+     }
+     
+     class Wind implements Instrument {
+         @Override
+         public String toString() {
+             return "Wind";
+         }
+     }
+     
+     class Percussion implements Instrument {
+         @Override
+         public String toString() {
+             return "Percussion";
+         }
+     }
+     
+     class Stringed implements Instrument {
+         @Override
+         public String toString() {
+             return "Stringed";
+         }
+     }
+     
+     class Brass extends Wind {
+         @Override
+         public String toString() {
+             return "Brass";
+         }
+     }
+     
+     class Woodwind extends Wind {
+         @Override
+         public String toString() {
+             return "Woodwind";
+         }
+     }
+     
+     public class Music5 {
+         // Doesn't care about type, so new types
+         // added to the system still work right:
+         static void tune(Instrument i) {
+             // ...
+             i.play(Note.MIDDLE_C);
+         }
+         
+         static void tuneAll(Instrument[] e) {
+             for (Instrument i: e) {
+                 tune(i);
+             }
+         }
+         
+         public static void main(String[] args) {
+             // Upcasting during addition to the array:
+             Instrument[] orchestra = {
+                 new Wind(),
+                 new Percussion(),
+                 new Stringed(),
+                 new Brass(),
+                 new Woodwind()
+             }
+             tuneAll(orchestra);
+         }
+     }
+     ```
+
+     ```
+     Wind.play() MIDDLE_C
+     Percussion.play() MIDDLE_C
+     Stringed.play() MIDDLE_C
+     Brass.play() MIDDLE_C
+     Woodwind.play() MIDDLE_C
+     ```
 
 3. 若X  implements A， B，则X的实例化对象也是A、B接口的实例化对象，instanceof判断为true
 
@@ -1631,16 +1849,14 @@ public class TestDemo{
 #### 使用原则
 
 1. 必须有子类，可用implements关键字实现多个接口，避免单继承的局限
-
 2. 如果子类不是抽象类，则必须覆写全部抽象方法
-
 3. 接口对象可利用子类对象向上转型进行实例化操作
 
 #### 接口简化定义
 
 接口中的方法修饰是public abstract
 
-属性定义可以默认是static final
+属性定义可以默认是`static final`
 
 - **简化写法**
   - abstract省略
@@ -1658,9 +1874,76 @@ public class TestDemo{
 - 表示一种操作能力
 - 将服务器读入的远程方法视图暴露给客户端：分布式开发
 
+#### 完全解耦
+
+```
+Applicator 的 apply() 方法可以接受任何类型的 Processor，并将其应用到一个 Object 对象上输出结果。像本例中这样，创建一个能根据传入的参数类型从而具备不同行为的方法称为策略设计模式。方法包含算法中不变的部分，策略包含变化的部分。策略就是传入的对象，它包含要执行的代码。在这里，Processor 对象是策略，main() 方法展示了三种不同的应用于 String s 上的策略。
+```
+
+```java
+// interfaces/Applicator.java
+import java.util.*;
+
+class Processor {
+    public String name() {
+        return getClass().getSimpleName();
+    }
+    
+    public Object process(Object input) {
+        return input;
+    }
+}
+
+class Upcase extends Processor {
+    // 返回协变类型
+    @Override 
+    public String process(Object input) {
+        return ((String) input).toUpperCase();
+    }
+}
+
+class Downcase extends Processor {
+    @Override
+    public String process(Object input) {
+        return ((String) input).toLowerCase();
+    }
+}
+
+class Splitter extends Processor {
+    @Override
+    public String process(Object input) {
+        // split() divides a String into pieces:
+        return Arrays.toString(((String) input).split(" "));
+    }
+}
+
+public class Applicator {
+    public static void apply(Processor p, Object s) {
+        System.out.println("Using Processor " + p.name());
+        System.out.println(p.process(s));
+    }
+    
+    public static void main(String[] args) {
+        String s = "We are such stuff as dreams are made on";
+        apply(new Upcase(), s);
+        apply(new Downcase(), s);
+        apply(new Splitter(), s);
+    }
+}
+```
+
+```
+Using Processor Upcase
+WE ARE SUCH STUFF AS DREAMS ARE MADE ON
+Using Processor Downcase
+we are such stuff as dreams are made on
+Using Processor Splitter
+[We, are, such, stuff, as, dreams, are, made, on]
+```
 
 
-### 4.10 接口应用：工厂设计模式
+
+#### 4.10 接口应用：工厂设计模式
 
 ***
 
@@ -1672,17 +1955,26 @@ public class TestDemo{
   - 客户端调用简单，不需要关注具体的细节
   - 程序代码的修改，不影响客户端的调用，使用者不用担心代码是否变更
 
-### 4.11 接口应用：代理设计模式
+#### 4.11 接口应用：代理设计模式
 
-### 4.12接口与抽象类
+#### 4.12接口与抽象类
 
 1. 接口的典型使用是代表一个类的类型或一个形容词，如 Runnable 或 Serializable，而抽象类通常是类层次结构的一部分或一件事物的类型，如 String 或 ActionHero。
+2. 在合理的范围内尽可能地抽象。因此，更倾向使用接口而不是抽象类。只有当必要时才使用抽象类。除非必须使用，否则不要用接口和抽象类
 
 > **优先考虑接口**
 
+| 特性                 | 接口                                                       | 抽象类                                   |
+| -------------------- | ---------------------------------------------------------- | ---------------------------------------- |
+| 组合                 | 新类可以组合多个接口                                       | 只能继承单一抽象类                       |
+| 状态                 | 不能包含属性（除了静态属性，不支持对象状态）               | 可以包含属性，非抽象方法可能引用这些属性 |
+| 默认方法 和 抽象方法 | 不需要在子类中实现默认方法。默认方法可以引用其他接口的方法 | 必须在子类中实现抽象方法                 |
+| 构造器               | 没有构造器                                                 | 可以有构造器                             |
+| 可见性               | 隐式 **public**                                            | 可以是 **protected** 或 "friendly"       |
+
 ![image-20210124211907454](Java基础.assets/image-20210124211907454.png)
 
-### 4.13 接口使用建议
+#### 4.13 接口使用建议
 
 ***
 
@@ -1690,7 +1982,7 @@ public class TestDemo{
 - 有了接口就需要利用子类完善方法
 - 自己写的接口，不要直接用new关键字直接实例化接口子类，而应该使用工厂类完成
 
-### 4.14 如何使用各类概念
+#### 4.14 如何使用各类概念
 
 ***
 
