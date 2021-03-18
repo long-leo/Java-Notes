@@ -339,13 +339,13 @@ public class OverloadingVarargs2 {
 
 ***
 
-- > 要求
-  
-  - 类名称必须由存在意义
-  - 属性private声明，每个属性均提供setter、getter
-  - 构造方法可多个，但必须保留一个无参构造
-  - 类中不允许出现任何输出语句，信息输出交由调用处
-  - 类中提供一个取得对象完整信息的方法，以String型数据返回
+> 要求
+
+- 类名称必须由存在意义
+- 属性private声明，每个属性均提供setter、getter
+- 构造方法可多个，但必须保留一个无参构造
+- 类中不允许出现任何输出语句，信息输出交由调用处
+- 类中提供一个取得对象完整信息的方法，以String型数据返回
 
 ### 3.7 数组
 
@@ -353,26 +353,26 @@ public class OverloadingVarargs2 {
 
 #### 3.7.1 数组操作方法
 
-- src / dest 如果是数组对象, 那么就是数组复制操作
+src / dest 如果是数组对象, 那么就是数组复制操作
 
-  > 该方法属于System类
+> 该方法属于System类
 
-  ```java
-  public static void arraycopy(Object src, int srcPos, Object dest, int destPos, int length)
-  ```
+```java
+public static void arraycopy(Object src, int srcPos, Object dest, int destPos, int length)
+```
 
-- 数组排序
+数组排序
 
-  > 1. 基本数据类型数组, 基本数据类型包装类和String类型,(实现了Comparable接口)可以直接使用该方法
-  > 2. 自定义类需要实现Comparable接口, 并且重写compareTo方法
-  > 3. 如果设计类时没有实现Comparable接口, 可以写一个比较器类, 该比较器类实现了Comparator接口
+> 1. 基本数据类型数组, 基本数据类型包装类和String类型,(实现了Comparable接口)可以直接使用该方法
+> 2. 自定义类需要实现Comparable接口, 并且重写compareTo方法
+> 3. 如果设计类时没有实现Comparable接口, 可以写一个比较器类, 该比较器类实现了Comparator接口
 
-  ```java
-  // 从小到大排序
-  java.util.Arrays.sort(数组)
-  ```
+```java
+// 从小到大排序
+java.util.Arrays.sort(数组)
+```
 
-  
+
 
 ### 3.8 String类
 
@@ -980,57 +980,156 @@ class B{  // 外围类
 
 #### 3.15.1 定义在类中
 
-- **在类中定义普通内部类（成员内部类）**
-  - 不能定义静态方法、静态成员、静态代码块
-    - 类加载时，要触发内部类的类加载，需要给内部类创建对象，而内部类又依赖于外部类对象，故内部类的静态方法、成员、代码块无法加载
-      - 反射机制也不能不创建外围类对象而创建成员内部类对象
-  - 可以定义全局常量（加入了常量池）
-  - 访问权限
+**特点**
 
-- **在外部类方法中实例化内部类对象**，
-  
-  - 调用内部类方法可轻松访问外部类的私有属性和内部类的私有属性
-  
-- 在内部类中，
-  
-  - **外部类.this:  表示当前外部类对象**
-  
-- **实例化内部类** （内部类依赖于外部类）
-  
-  - 在外部类中实例化
-  
-    ```java
-    // 方式1
-    外围类.内部类 对象  =  new  外围类().new 内部类();
-    // 方式2
-    外围类  对象B  = new  外围类();
-    外围类.内部类  对象C = B.new 内部类();
-    ```
-  
-  - 在外围类中示例化
-  
-    > 注意, 在外部类实例化内部类的方法同样适用于外围类, 不仅限于下面的方法
-  
-    ```java
-    // 方式1
-    内部类 对象  =  new  外围类().new 内部类();
-    // 方式2
-    外围类  对象B  = new  外围类();
-    内部类  对象C = B.new 内部类();
-    ```
-  
-- **私有内部部类**
-  
-  - private声明内部类，此时只能由其所在外部类访问，其他外部类不能访问
-  
-- **static定义内部类**
-  - 内部类与外部类的类加载是相互独立的，互不干涉
-  - 不受外部类实例化对象约束
-  - 相对于变为外部类，**只能访问外部类staic属性或方法**
-  - 实例化static内部类对象
-    - 外部类.内部类  对象  =  new   **外部类.内部类（）;**
+1. 不能定义静态方法、静态成员、静态代码块
 
-> **在方法中定义内部类（最常用） **
+   ```
+   类加载时，要触发内部类的类加载，需要给内部类创建对象，而内部类又依赖于外部类对象，故内部类的静态方法、成员、代码块无法加载
+   ```
+
+2. 反射机制也不能不创建外围类对象而创建成员内部类对象
+
+3. 可以定义全局常量（加入了常量池）
+
+**访问权限**
+
+1. 内部类访问外部类
+
+   ```
+   内部类可以访问其外部对象的所有成员，而不需要任何特殊条件。此外，内部类还拥有其外部类的所有元素的访问权。
+   ```
+
+2. 
+
+**实例化内部类对象**
+
+- 在外部类中实例化
+
+  ```java
+  // 方式1
+  外围类.内部类 对象  =  new  外围类().new 内部类();
+  // 方式2
+  外围类  对象B  = new  外围类();
+  外围类.内部类  对象C = B.new 内部类();
+  ```
+
+- 在外围类中实例化
+
+  > 注意, 在外部类实例化内部类的方法同样适用于外围类, 不仅限于下面的方法
+
+  ```java
+  // 方式1
+  内部类 对象  =  new  外围类().new 内部类();
+  // 方式2
+  外围类  对象B  = new  外围类();
+  内部类  对象C = B.new 内部类();
+  ```
+
+**私有内部类**
+
+- private声明内部类，此时只能由其所在外部类访问，其他外部类不能访问
+
+#### static定义内部类
+
+普通的内部类对象隐式地保存了一个引用，指向创建它的外部类对象。然而，当内部类是 **static** 的时，就不是这样了。嵌套类意味着：
+
+1. 创建嵌套类的对象时，不需要其外部类的对象。
+2. 不能从嵌套类的对象中访问非静态的外部类对象
+
+普通的内部类不能有 **static** 数据和 **static** 字段
+
+```java
+// innerclasses/Parcel11.java
+// Nested classes (static inner classes)
+public class Parcel11 {
+    private static class ParcelContents implements Contents {
+        private int i = 11;
+        @Override
+        public int value() { return i; }
+    }
+    protected static final class ParcelDestination
+            implements Destination {
+        private String label;
+        private ParcelDestination(String whereTo) {
+            label = whereTo;
+        }
+        @Override
+        public String readLabel() { return label; }
+        // Nested classes can contain other static elements:
+        public static void f() {}
+        static int x = 10;
+        static class AnotherLevel {
+            public static void f() {}
+            static int x = 10;
+        }
+    }
+    public static Destination destination(String s) {
+        return new ParcelDestination(s);
+    }
+    public static Contents contents() {
+        return new ParcelContents();
+    }
+    public static void main(String[] args) {
+        Contents c = contents();
+        Destination d = destination("Tasmania");
+    }
+}
+```
+
+
+
+- 内部类与外部类的类加载是相互独立的，互不干涉
+- 不受外部类实例化对象约束
+- 相对于变为外部类，**只能访问外部类staic属性或方法**
+- 实例化static内部类对象
+  - 外部类.内部类  对象  =  new   **外部类.内部类（）;**
+
+
+
+在接口中定义内部类
+
+```java
+// innerclasses/ClassInInterface.java
+// {java ClassInInterface$Test}
+public interface ClassInInterface {
+    void howdy();
+    class Test implements ClassInInterface {
+        @Override
+        public void howdy() {
+            System.out.println("Howdy!");
+        }
+        public static void main(String[] args) {
+            new Test().howdy();
+        }
+    }
+}
+```
+
+我曾在本书中建议过，在每个类中都写一个 `main()` 方法，用来测试这个类。这样做有一个缺点，那就是必须带着那些已编译过的额外代码。如果这对你是个麻烦，那就可以使用嵌套类来放置测试代码。
+
+```java
+// innerclasses/TestBed.java
+// Putting test code in a nested class
+// {java TestBed$Tester}
+public class TestBed {
+    public void f() { System.out.println("f()"); }
+    public static class Tester {
+        public static void main(String[] args) {
+            TestBed t = new TestBed();
+            t.f();
+        }
+    }
+}
+```
+
+
+
+#### 3.15.3 在方法中定义内部类(最常用)
+
+方法体之外不可以访问该内部类
+
+
 
 ```java
 class Outer{
@@ -1046,18 +1145,167 @@ class Outer{
 }
 ```
 
-- 内部类中可访问方法中的参数或变量
-  - JDK 1.8开始，在1.7及之前的版本，只能访问final声明的变量或参数，如final double score;因此添加final关键字是一个好习惯
+- 内部类可访问方法中的参数或变量
+  - 这是从JDK 1.8开始的，JDK1.8之后, 编译器会自动添加一个final, 在1.7及之前的版本，只能访问final声明的变量或参数，如final double score;因此添加final关键字是一个好习惯
+
+
+
+#### 3.15.3 在其他作用域定义内部类
+
+内部类可以定义在任意作用域内
+
+比如 `if`  判断中
+
+```java
+// innerclasses/Parcel6.java
+// Nesting a class within a scope
+public class Parcel6 {
+    private void internalTracking(boolean b) {
+        if(b) {
+            class TrackingSlip {
+                private String id;
+                TrackingSlip(String s) {
+                    id = s;
+                }
+                String getSlip() { return id; }
+            }
+            TrackingSlip ts = new TrackingSlip("slip");
+            String s = ts.getSlip();
+        }
+        // Can't use it here! Out of scope:
+        //- TrackingSlip ts = new TrackingSlip("x");
+    }
+    public void track() { internalTracking(true); }
+    public static void main(String[] args) {
+        Parcel6 p = new Parcel6();
+        p.track();
+    }
+}
+```
+
+
+
+#### 其他
+
+在接口中定义内部类, 并实现该接口
+
+```java
+// innerclasses/ClassInInterface.java
+// {java ClassInInterface$Test}
+public interface ClassInInterface {
+    void howdy();
+    class Test implements ClassInInterface {
+        @Override
+        public void howdy() {
+            System.out.println("Howdy!");
+        }
+        public static void main(String[] args) {
+            new Test().howdy();
+        }
+    }
+}
+
+```
+
+嵌套类放置测试代码
+
+```java
+// innerclasses/TestBed.java
+// Putting test code in a nested class
+// {java TestBed$Tester}
+public class TestBed {
+    public void f() { System.out.println("f()"); }
+    public static class Tester {
+        public static void main(String[] args) {
+            TestBed t = new TestBed();
+            t.f();
+        }
+    }
+}
+
+```
+
+
+
+#### 为什么需要内部类
+
+1. 内部类继承自某个类或实现某个接口，内部类的代码操作创建它的外部类的对象。**内部类提供了某种进入其外部类的窗口**。
+
+2. **每个内部类都能独立地继承自一个（接口的）实现，所以无论外部类是否已经继承了某个（接口的）实现，对于内部类都没有影响**
+
+3. 内部类可以实现**"多重继承"**
+
+   ```java
+   // innerclasses/MultiImplementation.java
+   // For concrete or abstract classes, inner classes
+   // produce "multiple implementation inheritance"
+   // {java innerclasses.MultiImplementation}
+   package innerclasses;
+   
+   class D {}
+   
+   abstract class E {}
+   
+   class Z extends D {
+       E makeE() {
+         return new E() {};  
+       }
+   }
+   
+   public class MultiImplementation {
+       static void takesD(D d) {}
+       static void takesE(E e) {}
+       
+       public static void main(String[] args) {
+           Z z = new Z();
+           takesD(z);
+           takesE(z.makeE());
+       }
+   }
+   ```
+
+
+
+#### 内部类的几大特点
+
+1. 内部类可以有多个实例，每个实例都有自己的状态信息，并且与其外部类对象的信息相互独立。
+2. 在单个外部类中，可以让多个内部类以不同的方式实现同一个接口，或继承同一个类。 稍后就会展示一个这样的例子。
+3. 创建内部类对象的时刻并不依赖于外部类对象的创建
+4. 内部类并没有令人迷惑的"is-a”关系，它就是一个独立的实体。
+
+#### 继承内部类
+
+因为内部类的构造器必须连接到指向其外部类对象的引用，所以在继承内部类的时候，事情会变得有点复杂。问题在于，那个指向外部类对象的“秘密的”引用必须被初始化，而在派生类中不再存在可连接的默认对象。要解决这个问题，必须使用特殊的语法来明确说清它们之间的关联：
+
+```java
+// innerclasses/InheritInner.java
+// Inheriting an inner class
+class WithInner {
+    class Inner {}
+}
+public class InheritInner extends WithInner.Inner {
+    //- InheritInner() {} // Won't compile
+    InheritInner(WithInner wi) {
+        wi.super();
+    }
+    public static void main(String[] args) {
+        WithInner wi = new WithInner();
+        InheritInner ii = new InheritInner(wi);
+    }
+}
+```
 
 ### 3.16 链表
 
 ***
 
-- 链表基础功能
+链表基础功能
 
-  ![image-20210124143642985](Java基础.assets/image-20210124143642985.png)
+![image-20210124143642985](Java基础.assets/image-20210124143642985.png)
 
-#### 1.17 常用内存区域
+
+
+#### 3.17 常用内存区域
 
 ***
 
@@ -1949,11 +2197,151 @@ Using Processor Splitter
 
 ![image-20210124205833174](Java基础.assets/image-20210124205833174.png)
 
-- **Spring框架的核心目的就是解决代码耦合问题**
-- > **两个原则**
-  
-  - 客户端调用简单，不需要关注具体的细节
-  - 程序代码的修改，不影响客户端的调用，使用者不用担心代码是否变更
+```java
+// interfaces/Factories.java
+interface Service {
+    void method1();
+    void method2();
+}
+
+interface ServiceFactory {
+    Service getService();
+}
+
+class Service1 implements Service {
+    Service1() {} // Package access
+    
+    @Override
+    public void method1() {
+        System.out.println("Service1 method1");
+    }
+    
+    @Override
+    public void method2() {
+        System.out.println("Service1 method2");
+    }
+}
+
+class Service1Factory implements ServiceFactory {
+    @Override
+    public Service getService() {
+        return new Service1();
+    }
+}
+
+class Service2 implements Service {
+    Service2() {} // Package access
+    
+    @Override
+    public void method1() {
+        System.out.println("Service2 method1");
+    }
+    
+    @Override
+    public void method2() {
+        System.out.println("Service2 method2");
+    }
+}
+
+class Service2Factory implements ServiceFactory {
+    @Override
+    public Service getService() {
+        return new Service2();
+    }
+}
+
+public class Factories {
+    public static void serviceConsumer(ServiceFactory fact) {
+        Service s = fact.getService();
+        s.method1();
+        s.method2();
+    }
+    
+    public static void main(String[] args) {
+        serviceConsumer(new Service1Factory());
+        // Services are completely interchangeable:
+        serviceConsumer(new Service2Factory());
+    }
+}
+
+```
+
+
+
+```java
+// interfaces/Games.java
+// A Game framework using Factory Methods
+interface Game {
+    boolean move();
+}
+
+interface GameFactory {
+    Game getGame();
+}
+
+class Checkers implements Game {
+    private int moves = 0;
+    private static final int MOVES = 3;
+    
+    @Override
+    public boolean move() {
+        System.out.println("Checkers move " + moves);
+        return ++moves != MOVES;
+    }
+}
+
+class CheckersFactory implements GameFactory {
+    @Override
+    public Game getGame() {
+        return new Checkers();
+    }
+}
+
+class Chess implements Game {
+    private int moves = 0;
+    private static final int MOVES = 4;
+    
+    @Override
+    public boolean move() {
+        System.out.println("Chess move " + moves);
+        return ++moves != MOVES;
+    }
+}
+
+class ChessFactory implements GameFactory {
+    @Override
+    public Game getGame() {
+        return new Chess();
+    }
+}
+
+public class Games {
+    public static void playGame(GameFactory factory) {
+        Game s = factory.getGame();
+        while (s.move()) {
+            ;
+        }
+    }
+    
+    public static void main(String[] args) {
+        playGame(new CheckersFactory());
+        playGame(new ChessFactory());
+    }
+}
+```
+
+
+
+**Spring框架的核心目的就是解决代码耦合问题**
+
+> **两个原则**
+
+- 客户端调用简单，不需要关注具体的细节
+- 程序代码的修改，不影响客户端的调用，使用者不用担心代码是否变更
+
+
+
+
 
 #### 4.11 接口应用：代理设计模式
 
@@ -1987,6 +2375,136 @@ Using Processor Splitter
 ***
 
 ![image-20210124212433714](Java基础.assets/image-20210124212433714.png)
+
+#### 接口嵌套
+
+```
+// interfaces/nesting/NestingInterfaces.java
+// {java interfaces.nesting.NestingInterfaces}
+package interfaces.nesting;
+
+class A {
+    interface B {
+        void f();
+    }
+    
+    public class BImp implements B {
+        @Override
+        public void f() {}
+    }
+    
+    public class BImp2 implements B {
+        @Override
+        public void f() {}
+    }
+    
+    public interface C {
+        void f();
+    }
+    
+    class CImp implements C {
+        @Override
+        public void f() {}
+    }
+    
+    private class CImp2 implements C {
+        @Override
+        public void f() {}
+    }
+    
+    private interface D {
+        void f();
+    }
+    
+    private class DImp implements D {
+        @Override
+        public void f() {}
+    }
+    
+    public class DImp2 implements D {
+        @Override
+        public void f() {}
+    }
+    
+    public D getD() {
+        return new DImp2();
+    }
+    
+    private D dRef;
+    
+    public void receiveD(D d) {
+        dRef = d;
+        dRef.f();
+    }
+}
+
+interface E {
+    interface G {
+        void f();
+    }
+    // Redundant "public"
+    public interface H {
+        void f();
+    }
+    
+    void g();
+    // Cannot be private within an interface
+    //- private interface I {}
+}
+
+public class NestingInterfaces {
+    public class BImp implements A.B {
+        @Override
+        public void f() {}
+    }
+    
+    class CImp implements A.C {
+        @Override
+        public void f() {}
+    }
+    // Cannot implements a private interface except
+    // within that interface's defining class:
+    //- class DImp implements A.D {
+    //- public void f() {}
+    //- }
+    class EImp implements E {
+        @Override
+        public void g() {}
+    }
+    
+    class EGImp implements E.G {
+        @Override
+        public void f() {}
+    }
+    
+    class EImp2 implements E {
+        @Override
+        public void g() {}
+        
+        class EG implements E.G {
+            @Override
+            public void f() {}
+        }
+    }
+    
+    public static void main(String[] args) {
+        A a = new A();
+        // Can't access to A.D:
+        //- A.D ad = a.getD();
+        // Doesn't return anything but A.D:
+        //- A.DImp2 di2 = a.getD();
+        // cannot access a member of the interface:
+        //- a.getD().f();
+        // Only another A can do anything with getD():
+        A a2 = new A();
+        a2.receiveD(a.getD());
+    }
+}
+
+```
+
+
+
 
 ### 4.15 Object类
 
@@ -2052,33 +2570,142 @@ Using Processor Splitter
 
 ### 4.16 匿名内部类
 
-- 看代码
+如果在定义一个匿名内部类时，它要使用一个外部环境（在本匿名内部类之外定义）对象，那么编译器会要求其（该对象）参数引用是 **final** 或者是 “effectively final”（也就是说，该参数在初始化后不能被重新赋值，所以可以当作 **final**）的，就像你在 `destination()` 的参数中看到的那样。这里省略掉 **final** 也没问题，但通常加上 **final** 作为提醒比较好。
 
-  ```java
-  interface Message{
-      public void print();
-  }
-  
-  public class TestDemo{
-      public static void main(String[] args){
-          fun(new Message(){
-              public void print(){
-                  System.out.println("Hello World!");
-              }
-          })
-      }
-      
-  }
-  ```
+**无参构造器创建内部类**
 
-  
+```java
+interface Message{
+    public void print();
+}
 
-- **必须在抽象内部类或接口基础上才可以定义**
-- 为什么要匿名内部类
-  
-  - 抽象类或接口的子类只使用一次的时候
-  
+public class TestDemo{
+    public static void main(String[] args){
+        fun(new Message(){
+            public void print(){
+                System.out.println("Hello World!");
+            }
+        })
+    }
     
+}
+```
+
+```java
+// innerclasses/Parcel7.java
+// Returning an instance of an anonymous inner class
+public class Parcel7 {
+    public Contents contents() {
+        return new Contents() { // Insert class definition
+            private int i = 11;
+          
+            @Override
+            public int value() { return i; }
+        }; // Semicolon required
+    }
+  
+    public static void main(String[] args) {
+        Parcel7 p = new Parcel7();
+        Contents c = p.contents();
+    }
+}
+```
+
+
+
+**有参构造器创建内部类**
+
+```java
+// innerclasses/Parcel8.java
+// Calling the base-class constructor
+public class Parcel8 {
+    public Wrapping wrapping(int x) {
+        // Base constructor call:
+        return new Wrapping(x) { // [1]
+            @Override
+            public int value() {
+                return super.value() * 47;
+            }
+        }; // [2]
+    }
+    public static void main(String[] args) {
+        Parcel8 p = new Parcel8();
+        Wrapping w = p.wrapping(10);
+    }
+}
+```
+
+通常在抽象内部类或接口基础上才可以定义
+
+并且抽象类或接口的子类只使用一次的时候
+
+**为什么要匿名内部类**
+
+```java
+// innerclasses/AnonymousConstructor.java
+// Creating a constructor for an anonymous inner class
+abstract class Base {
+    Base(int i) {
+        System.out.println("Base constructor, i = " + i);
+    }
+    public abstract void f();
+}
+public class AnonymousConstructor {
+    public static Base getBase(int i) {
+        return new Base(i) {
+            { System.out.println(
+                    "Inside instance initializer"); }
+            @Override
+            public void f() {
+                System.out.println("In anonymous f()");
+            }
+        };
+    }
+    public static void main(String[] args) {
+        Base base = getBase(47);
+        base.f();
+    }
+}
+```
+
+**匿名内部类只会执行构造器**
+
+```java
+// innerclasses/Parcel10.java
+// Using "instance initialization" to perform
+// construction on an anonymous inner class
+public class Parcel10 {
+    public Destination
+    destination(final String dest, final float price) {
+        return new Destination() {
+            private int cost;
+            // Instance initialization for each object:
+            {
+                cost = Math.round(price);
+                if(cost > 100)
+                    System.out.println("Over budget!");
+            }
+            private String label = dest;
+            @Override
+            public String readLabel() { return label; }
+        };
+    }
+    public static void main(String[] args) {
+        Parcel10 p = new Parcel10();
+        Destination d = p.destination("Tasmania", 101.395F);
+    }
+}
+```
+
+在实例初始化操作的内部，可以看到有一段代码，它们不能作为字段初始化动作的一部分来执行（就是 **if** 语句）。所以对于匿名类而言，实例初始化的实际效果就是构造器。当然它受到了限制-你不能重载实例初始化方法，所以你仅有一个这样的构造器。
+
+匿名内部类与正规的继承相比有些受限，因为匿名内部类要么继承类，要么实现接口，但是不能两者兼备。而且如果是实现接口，也只能实现一个接口。
+
+
+
+
+
+
 
 ### 4.17 基本数据类型的包装
 #### 4.17.1 对象型包装类(Object 直接子类)
@@ -4456,7 +5083,7 @@ public int nextInt(int bound)  //产生一个不大于指定边界的随机整�
   }
   ```
 
-- 挽救的比较器 Comparator
+- **挽救的比较器 Comparator**(实际开发使用该比较器, 程序维护方便)
 
   ```java
   @FunctionalInterface
@@ -4559,7 +5186,7 @@ public int nextInt(int bound)  //产生一个不大于指定边界的随机整�
 
 #### 10.9.1 Class对象实例化
 
-> 需要注意的是, 这三种方法获取同一个类的Class类对象, 由于读取的是同一个字节码文件, 他们利用==比较时, 结果位true
+> 需要注意的是, 这三种方法获取同一个类的Class类对象, 由于读取的是同一个字节码文件, 他们利用==比较时, 结果为true
 
 - 调用Object类中的getClass() 方法
 
@@ -4660,6 +5287,7 @@ public int nextInt(int bound)  //产生一个不大于指定边界的随机整�
           // 此处Fruit是一个抽象类
           Fruit f = null;
           try{
+              // 向上转型
               f = (Fruit) Class.forName(className).newInstance();
           }catch(Exception e){
   			//....
@@ -4668,7 +5296,8 @@ public int nextInt(int bound)  //产生一个不大于指定边界的随机整�
       }
   }
   ```
-
+```
+  
   
 
 #### 10.9.4 使用反射调用有参构造
@@ -4681,7 +5310,7 @@ public int nextInt(int bound)  //产生一个不大于指定边界的随机整�
 
     ```java
     public Constructor<?>[] getConstructors() throws SecurityException;
-    ```
+```
 
   - 获取全部构造方法(**包括私有方法**)
 
@@ -4699,7 +5328,7 @@ public int nextInt(int bound)  //产生一个不大于指定边界的随机整�
   - 取得指定参数类型的构造方法(**private构造也可以**)
   
     ```java
-    public Constructor<T> getConstructor(Class<?>... parameterTypes) throws NoSuchMethodException, SecurityException;
+    public Constructor<T> getDeclaredConstructor(Class<?>... parameterTypes) throws NoSuchMethodException, SecurityException;
     ```
   
 - Constructor类的常用方法
@@ -5722,7 +6351,7 @@ public static void print(File file){
 
 #### 11.10.4 DataOutputStream
 
-> 处理java基本数据类型输入,比如一个整数, 是一种包装流(包装了OutputStream)
+> 处理java**基本数据类型**输入,比如一个整数, 是一种包装流(包装了OutputStream)
 
 - 常用方法
 
@@ -5732,7 +6361,7 @@ public static void print(File file){
     public DataOutputStream(OutputStream out);
     ```
 
-  - 写Java基本数据类型(**把数据写入文件中, 由于编码表中没有Java基本数据类型编码, 写入文件数据显示位乱码**)
+  - 写Java基本数据类型(**把数据写入文件中, 由于编码表中没有Java基本数据类型编码, 写入文件数据显示为乱码**)
 
     ```java
     public final void writeInt(int v) throws IOException
@@ -5835,7 +6464,7 @@ public static void print(File file){
 - 字符缓冲区流
   - **BufferedReader**
   - BufferedWriter
-- 字节缓冲区流(**默认缓冲区大小是8192个字节, 即8kB)
+- 字节缓冲区流(**默认缓冲区大小是8192个字节, 即8kB**)
   - BufferedInputStream
   - BufferedOutputStream
 
@@ -5894,7 +6523,7 @@ public static void print(File file){
 
 #### 11.12.2 BufferedWriter
 
-- 默认缓冲区大小为8192个字符, 即16kB
+- **默认缓冲区大小为8192个字符, 即16kB**
 
 - 方法
 
@@ -5904,49 +6533,48 @@ public static void print(File file){
     void newLine()
     ```
 
-     
+    
 
-  
 
 ### 11.13扫描流 Scanner
 
 #### 11.13.1 常用方法
 
-- 接收InputStream输入流对象, 此为输入源
+接收InputStream输入流对象, 此为输入源
 
-  ```java
-  public Scanner(InputStream source)
-  ```
+```java
+public Scanner(InputStream source)
+```
 
-- 判断是否由数据输入
+判断是否由数据输入
 
-  ```java
-  public boolean hasNext()
-  ```
+```java
+public boolean hasNext()
+```
 
-- 取出输入数据, 以String形式返回
+取出输入数据, 以String形式返回
 
-  ```java
-  public String next()
-  ```
+```java
+public String next()
+```
 
-- 判断是否有指定类型数据存在
+判断是否有指定类型数据存在
 
-  ```java
-  public boolean hasNextXxx()
-  ```
+```java
+public boolean hasNextXxx()
+```
 
-- 取出指定数据类型的数据
+取出指定数据类型的数据
 
-  ```java
-  public 数据类型 nextXxx()
-  ```
+```java
+public 数据类型 nextXxx()
+```
 
-- 设置读取的分隔符
+设置读取的分隔符
 
-  ```java
-  public Scanner useDelimiter(String patten)
-  ```
+```java
+public Scanner useDelimiter(String patten)
+```
 
 #### 11.13.2 标准输入形式
 
@@ -5987,6 +6615,110 @@ public class Test {
     }
 }
 ```
+
+#### 11.14.5 Scanner类扩展
+
+类 **Scanner** 的构造器接受的是一个 **Readable** 接口, 如果你创建了一个新类并想让 **Scanner** 作用于它，就让它实现 **Readable** 接口
+
+```java
+// interfaces/RandomStrings.java
+// Implementing an interface to conform to a method
+import java.nio.*;
+import java.util.*;
+
+public class RandomStrings implements Readable {
+    private static Random rand = new Random(47);
+    private static final char[] CAPITALS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
+    private static final char[] LOWERS = "abcdefghijklmnopqrstuvwxyz".toCharArray();
+    private static final char[] VOWELS = "aeiou".toCharArray();
+    private int count;
+    
+    public RandomStrings(int count) {
+        this.count = count;
+    }
+    
+    @Override
+    public int read(CharBuffer cb) {
+        if (count-- == 0) {
+            return -1; // indicates end of input
+        }
+        cb.append(CAPITALS[rand.nextInt(CAPITALS.length)]);
+        for (int i = 0; i < 4; i++) {
+            cb.append(VOWELS[rand.nextInt(VOWELS.length)]);
+            cb.append(LOWERS[rand.nextInt(LOWERS.length)]);
+        }
+        cb.append(" ");
+        return 10; // Number of characters appended
+    }
+    
+    public static void main(String[] args) {
+        Scanner s = new Scanner(new RandomStrings(10));
+        while (s.hasNext()) {
+            System.out.println(s.next());
+        }
+    }
+}
+
+```
+
+
+
+适配器模式与Scanner方法
+
+```java
+// interfaces/RandomDoubles.java
+import java.util.*;
+
+public interface RandomDoubles {
+    Random RAND = new Random(47);
+    
+    default double next() {
+        return RAND.nextDouble();
+    }
+    
+    static void main(String[] args) {
+        RandomDoubles rd = new RandomDoubles(){};
+        for (int i = 0; i < 7; i++) {
+            System.out.println(rd.next() + " ");
+        }
+    }
+}
+
+```
+
+```java
+// interfaces/AdaptedRandomDoubles.java
+// creating an adapter with inheritance
+import java.nio.*;
+import java.util.*;
+
+public class AdaptedRandomDoubles implements RandomDoubles, Readable {
+    private int count;
+    
+    public AdaptedRandomDoubles(int count) {
+        this.count = count;
+    }
+    
+    @Override
+    public int read(CharBuffer cb) {
+        if (count-- == 0) {
+            return -1;
+        }
+        String result = Double.toString(next()) + " ";
+        cb.append(result);
+        return result.length();
+    }
+    
+    public static void main(String[] args) {
+        Scanner s = new Scanner(new AdaptedRandomDoubles(7));
+        while (s.hasNextDouble()) {
+            System.out.print(s.nextDouble() + " ");
+        }
+    }
+}
+```
+
+
 
 ### 11.15 关于IO输入与输出的总结
 
@@ -6122,7 +6854,25 @@ public class Test {
 
   > 建议编写代码时统一设置为UTF-8的形式
 
+
+
+
+
 ## 十二. 类集框架
+
+> 例如， **LinkedList** 具有 **List** 接口中未包含的额外方法，而 **TreeMap** 也具有在 **Map** 接口中未包含的方法。如果需要使用这些方法，就不能将它们向上转型为更通用的接口。
+
+```bash
+## 重要程度
+
+1. HashMap, ArrayList
+2. HashSet, LinkedList
+3. LinkedHashMap, LinkedHashSet, TreeSet, TreeMap
+4. ArrayDeque, queue
+5. 其他
+```
+
+![image-20210310102838999](Java基础.assets/image-20210310102838999.png)
 
 ### 12.1 类集框架简介
 
@@ -6146,62 +6896,111 @@ public class Test {
 > public interface Collection<E> extends Iterable<E>;
 > ```
 
+Collection应该需要研究哪些东西
+
+```
+1, Collection是Collection集合体系顶级接口
+2, 一些 collection的子类实现 允许有'重复'的元素，而另一些子类实现则不允许重复元素
+3, 一些 collection 的子类实现是有序的，而另一些子类实现则是无序的。
+4, 某些实现禁止 null 元素，而某些实现则对元素的类型有限制.
+5, JDK 不提供此接口的任何直接实现：它提供更具体的子接口（如 Set 和 List）实现。
+```
+
+
+
 #### 12.2.1常用方法
 
-- **向集合里面保存数据**
+**向集合里面保存数据**
 
-  ```java
-  public boolean add(E e)
-  ```
+```java
+public boolean add(E e)
+```
 
-- 追加一个集合
+追加一个集合,(这个集合的所有元素添加到调用该方法的对象中)
 
-  ```java
-  // ???
-  public boolean addAll(Collection<? extends E> c)
-  ```
+```java
+// ???
+public boolean addAll(Collection<? extends E> c)
+```
 
-- 清空集合, 根元素为null
+清空集合, 根元素为null
 
-  ```java
-  public void clear()
-  ```
+```java
+public void clear()
+```
 
-- 判断是否包含指定的内容, **需要equals支持**
+判断是否包含指定的内容, **需要equals支持**
 
-  ```java
-  public boolean contains(Object o)
-  ```
+```java
+public boolean contains(Object o)
+```
 
-- 判断是否是空集合(不是null)
+判断是否是空集合(不是null)
 
-  ```java
-  public boolean isEmpty()
-  ```
+```java
+public boolean isEmpty()
+```
 
-- 删除对象, 需要**equals支持**
+删除对象, 需要**equals支持**
 
-  ```java
-  public boolean remove(Object o)
-  ```
+```java
+public boolean remove(Object o)
+```
 
-- 取得集合中保存的元素个数
+取得集合中保存的元素个数
 
-  ```java
-  public int size()
-  ```
+```java
+public int size()
+```
 
-- 将集合变为对象数组保存
+将集合变为对象数组保存
 
-  ```java
-  public Object[] toArray()
-  ```
+```java
+public Object[] toArray()
+```
 
-- **为Iterator接口实例化**
+```java
+public <T> T Object[] toArray(T[] a);
 
-  ```java
-  public Iterator<E> iterator()
-  ```
+
+public <T> T[] toArray(T[] a) {
+    if (a.length < size)
+        // Make a new array of a's runtime type, but my contents:
+        return (T[]) Arrays.copyOf(elementData, size, a.getClass());
+    System.arraycopy(elementData, 0, a, 0, size);
+    if (a.length > size)
+        a[size] = null;
+    return a;
+}
+
+public static <T,U> T[] copyOf(U[] original, int newLength, Class<? extends T[]> newType) {
+    @SuppressWarnings("unchecked")
+    T[] copy = ((Object)newType == (Object)Object[].class)
+        ? (T[]) new Object[newLength]
+        : (T[]) Array.newInstance(newType.getComponentType(), newLength);
+    System.arraycopy(original, 0, copy, 0,
+                     Math.min(original.length, newLength));
+    return copy;
+}
+
+
+如果传递一个足够长度的数组
+// 返回值数组的类型时传进去的数组类型
+// 返回值数组和传进去的数组的元素值相等
+// 如果集合类中有x个元素, 那么数组的前x个位置原本的内容会被覆盖
+// 
+
+反之
+
+```
+
+
+
+**为Iterator接口实例化**
+
+```java
+public Iterator<E> iterator()
+```
 
 - Collection接口无法区分保存的数据是否重复，故通常用其子接口List（数据允许重复）和Set（数据不允许重复）
 
@@ -6211,48 +7010,130 @@ public class Test {
 
 ### 12.3 List接口
 
-#### 12.3.1 扩充的方法
+```bash
+1. List是`Collection`的一个"线性表"子接口
+2. 其表示的数据结构是一个线性表
+3. List的子实现必定是有序的
+4. 允许存储null
+5. 数据允许重复
+```
 
-- 取得索引编号的内容
+#### 12.3.1 扩充的方法(相对于Collection接口)
 
-  ```java
-  public E get(int index)
-  ```
+```java
+public void add(int index, Element e)
+```
 
-- 修改指定索引编号的内容
 
-  ```java
-  public E set(int index, E element)
-  ```
 
-- 为ListIterator接口实例化
+```java
+public E get(int index)
+```
 
-  ```java
-  public ListIterator<E> listIterator()
-  ```
+
+
+```java
+public int indexOf(Object o)
+```
+
+
+
+```java
+public int lastIndexOf(Object o);
+```
+
+
+
+```java
+public E remove(int index)
+```
+
+
+
+```java
+public E set(int index, E element)
+```
+
+
+
+```java
+public ListIterator<E> listIterator();
+```
+
+
+
+
 
 #### 12.3.2 ArrayList(List接口子类)
 
-- 代码示例
+```
+1. 是List接口的数组实现
+2. 表示一个线性表
+3. 底层结构是数组
+4. 初始容量(10), 扩容机制(1.5倍扩容)
+5. 存储的元素是有序的
+6. 允许存储null元素
+7. 允许重复元素存储
+8. 线程不安全
+ArrayList与HashMap有什么区别
+```
 
-  ```java
-  List<String> all = new ArrayList<String>();
-  
-  System.out.println("长度：" + all.size() + ", 是否为空：" + all.isEmpty());
-  all.add("Hello");
-  all.add("Hello");
-  all.add("World");
-  System.out.println("长度：" + all.size() + ", 是否为空：" + all.isEmpty());
-  
-  // size():Collection接口定义的   get():List接口扩充的
-  for (int x = 0; x < all.size(); x++){
-      String str = all.get(x);
-      // 此处并并不是集合的标准输出方式
-      System.out.println(str);
-  }
-  ```
+构造方法
+
+![image-20210309162014687](Java基础.assets/image-20210309162014687.png)
+
+trimToSize()
+
+ensureCapacity()
+
+```java
+// 构建一个容量为10的空列表
+ArrayList()
+```
+
+
+
+
+
+
+
+
+
+代码示例
+
+```java
+List<String> all = new ArrayList<String>();
+
+System.out.println("长度：" + all.size() + ", 是否为空：" + all.isEmpty());
+all.add("Hello");
+all.add("Hello");
+all.add("World");
+System.out.println("长度：" + all.size() + ", 是否为空：" + all.isEmpty());
+
+// size():Collection接口定义的   get():List接口扩充的
+for (int x = 0; x < all.size(); x++){
+    String str = all.get(x);
+    // 此处并并不是集合的标准输出方式
+    System.out.println(str);
+}
+```
+
+
 
 #### 12.3.3 Vector(List接口子类)
+
+```bash
+1. List接口的子类实现
+2. 线性表实现
+3. 底层结构是一个数组
+4. `初始容量(默认初始容量是10)  扩容机制(扩容增量为0, 默认扩容2倍, 设置了扩容增量(大于零)时, 扩容数量为扩容增量)`
+5. 允许重复  null  有序
+6. `线程安全`
+```
+
+**常用集合类, 都是jdk1.2时产生的**
+
+**vector是jdk1.0时产生的**
 
 > 与ArrayList类使用上没有太大差别, 
 >
@@ -6260,7 +7141,108 @@ public class Test {
 
 
 
+##### Stack
+
+<img src="Java基础.assets/image-20210310101800471.png" alt="image-20210310101800471" style="zoom:50%;" />
+
+
+
+<img src="Java基础.assets/image-20210310102614824.png" alt="image-20210310102614824" style="zoom:50%;" />
+
+
+
+#### LinkedList
+
+1. LinkedList是List的一个链表实现
+2. 是一个线性表
+3. 底层维护了一个双向链表
+4. 允许存null
+5. 允许重复
+6. 有序
+7. 线程不安全
+8. LinkedLIst不仅仅是List子实现, 也是Deque接口的实现
+9. LinedList不仅仅可以作为一个普通的线性表, 它可以充当普通队列/ 双端队列/栈
+
+
+
+### Queue
+
+```
+Collection接口的子接口
+queue描述的是一个队列
+有序
+其子实现不允许存储null(LinkedList除外)
+允许重复元素
+```
+
+==不能存null的原因:==
+
+```
+在queue中出队列操作poll方法, 如果没有元素可以处队列了, 他不是抛出异常, 而是返回一个null, 如果允许存储null, 那么就会有歧义,(不知道是存储了元素还是存储的是null)
+```
+
+
+
+#### Deque
+
+```
+queue接口的双端队列子接口
+普通队列基础上的改进(两端都可以进行删除添加)
+有序
+允许重复
+不允许null
+可以作为队列/双端队列/栈
+```
+
+
+
+##### ArrayDeque
+
+```
+Deque接口的子类实现
+底层是一个循环数组
+初始容量 (默认初始容量是16)  扩容机制(2倍)
+有序
+允许重复
+不允许null
+线程不安全
+```
+
+==补充:===
+
+```
+new一个ArrayDeque, 传入一个初始参数(数组长度), 	构造的底层数组的长度会转为**大于**该参数的2的幂次方的最小长度, 而不是传入长度是多少就是多少
+
+
+```
+
+
+
+#### BlockingQueue
+
+```
+queue的子接口
+表示一个阻塞队列
+有序
+允许重复
+不允许null
+有阻塞方法
+其子实现都是线程安全的
+```
+
+![image-20210312211244578](Java基础.assets/image-20210312211244578.png)
+
 ### 12.4 Set子接口
+
+```bash
+Set子接口是Collection的一个子接口
+Set的一些子实现是有序的 `LinkedHashSet` `TreeSet`(大小有序)
+不允许存储重复元素(set存储的内容, 实际上都是要存储到底层的map对象上, 并作为key存在)
+有些实现允许存储null: (hashset  linkedhashset)
+有些子实现不允许存储null: treeset
+```
+
+
 
 > 1. Collection的子接口，没有对Collection接口进行大量扩充，
 >
@@ -6270,54 +7252,46 @@ public class Test {
 
 #### 12.4.1 TreeSet子类
 
+```bash
+1. Set接口的一个树实现
+2. TreeSet`底层持有一个TreeMap对象`
+3. 存储的元素需要实现比较器(`comparable`, `comparator`)
+4. 大小有序
+5. `不能存储重复元素`
+6. 不能存储null (null无法比较大小)
+7. 线程不安全
+```
 
-
-- 代码示例
-
-  ```java
-  Set<String> all = new TreeSet<String>();
-  all.add("jixianit");
-  all.add("jixianit");
-  all.add("mldn");
-  all.add("yootk");
-  all.add("yootk");
-  ```
-
-- 特点
-
-  - 有序
-  - 不重复
-
-- 如何实现有序
-
-  - 保存的对象对应的类**必须实现Comparable接口**
-  - 同时**覆写compareTo() 方法**, **覆写该方法时,应该比较该类所有属性**
+==TreeSet比较独特的API都是和元素大小息息相关的==
 
 #### 12.4.2 HashSet子类
 
-- 代码示例
+```bash
+1. 他是Set接口的一个子实现
+2. 底层持有一个`hashmap对象`(添加到hashset中的元素, 实际上都作为key添加到底层hashmap中了, hashmap的value值都是一个哑变量(value是同一个对象))
+3. 底层结构: hashmap
+4. 无序
+5. 允许存储null
+6. 不允许重复
+7. 线程不安全
+```
 
-  ```java
-  Set<String> all = new HashSet<String>();
-  all.add("jixianit");
-  all.add("mldn");
-  all.add("yootk");
-  all.add("yootk");
-  
-  // 最终保存的对象jixiamit  mldn  yootk
-  ```
 
-- 特点
 
-  - 无序
-  - 不重复
+##### LinkedHashSet
 
-- 如何实现对象不重复
-  - public int hashCode();
-    - 取得哈希码，依靠哈希码来取得一个对象的内容
-  - public boolean equals(Object obj);
-    - 如果哈希码相同, 则进一步对对象属性进行比较
-- 如何编写hashCode() 方法
+```
+1. HashSet子类
+2. 底层持有一个LinkedHashMap对象
+3. 有序(LinkedHashMap底层维护了一个双向链表)
+4. 允许null
+5. 不允许重复
+6. 线程不安全
+```
+
+
+
+#### 
 
 ### 12.5 集合输出
 
@@ -6337,49 +7311,131 @@ public class Test {
     public E next()
     ```
 
+  - 删除上一次遍历的的元素
+
+    ```java
+    // 1. 如果还未迭代元素, 进行删除操作会报错
+    // 2. 不能连续进行删除操作
+    public void remove()
+    ```
+
     
 
 - 任何集合类型都可以**通过调用iterator()方法**转换为Iterator接口输出
-- Iterator方法提供的remove()方法可以实现集合输出是不会出现异常
+- Iterator方法提供的remove()方法可以实现集合输出时不会出现异常
   
   - 也就是说在JDK1.8之前remove0属于一个普通的删除方法，而JDK1.8之后将其定义为一个接口的 default方法。而之所以提供这个方法，是因为在使用Iterator输出数据时，如果利用集合类（Collection、List、Set）提供的remove0方法会导致程序中断执行的问题，而如果非要进行集合元素的删除，只能利用Iterator 接口提供的remove0方法才可以正常完成。
 
+#### 并发修改异常
+
+在iterator遍历完成之前, 不应该使用原集合类的方法来修改源集合类, 在多线程的情况下, 一个线程在遍历, 另一个线程在修改(只要发生修改), 就会产生并发修改异常
+
+
+
 #### 12.5.2  ListIterator 双向迭代（Iterator子接口）
 
-- 常用方法
+```
+// 1. ListIterator是Iterator的子接口
+// 2. ListIterator的hasNext  next  remove与Iterator作用一致
+```
 
-  - 判断是否有前一个元素
+进行添加操作之后不可再进行删除
 
-    ```java
-    // 要有后向前迭代,必须先由前向后迭代
-    public boolean hasPrevious()
-    ```
+<img src="Java基础.assets/image-20210309145847705.png" alt="image-20210309145847705" style="zoom:50%;" />
 
-  - 取出前一个元素
+常用方法
 
-    ```java
-    // 要有后向前迭代,必须先由前向后迭代
-    public E previous()
-    ```
+- 判断是否有前一个元素
 
-  - 向集合追加数据
+  ```java
+  // 要有后向前迭代,必须先由前向后迭代
+  public boolean hasPrevious()
+  ```
 
-    ```java
-    public void add(E e)
-    ```
+- 取出前一个元素
 
-  - 修改集合数据
+  ```java
+  // 要由后向前迭代,必须先由前向后迭代
+  public E previous()
+  ```
 
-    ```java
-    public void set(E e)
-    ```
+- 向集合追加数据(可以连续添加)
 
-- 不常用
-- 可增加、修改、删除数据
+  ```java
+  public void add(E e)
+  ```
+
+- 修改集合数据(未遍历之前不可以修改, 可以连续修改, 因为set不会修改modcount)
+
+  ```java
+  public void set(E e)
+  ```
+
+- 
+
+  ```java
+  public int nextIndex();
+  public int previousIndex();
+  ```
+
+- 视图方法subList
+
+  ```java
+  // 从原list中获取子list
+  // 子list中
+  // 原list改变后或者子list改变都会使得两个list同时改变
+  List<E> subList(int fromIndex, int toIndex)
+  ```
+
+  ![image-20210309153807704](Java基础.assets/image-20210309153807704.png)
 
 #### 12.5.3 foreach输出
 
-- 初学不建议使用foreach，而应该使用Iteratior(???????)
+输出数组和集合类
+
+1. 对于集合类 , 本质是iterator迭代
+
+   ```
+   同样需要考虑并发修改异常
+   ```
+
+2. 对于数组, foreach会转化为fori循环
+
+==利用迭代器遍历时, 用list的remove删除一个元素, 可能会发生并发修改异常==
+
+```java
+public class Test {
+    public static void main(String[] args) {
+
+
+        ArrayList<String> list = new ArrayList<>();
+        list.add("1");
+        list.add("2");
+        list.add("3");
+        Iterator<String> iterator = list.iterator();
+
+        // hasNext()  return cursor != size;
+        // 最后一个元素被删除后, size减小, cursor != size, 程序误以为还有元素可遍历, 发生并发修改异常
+        // 只删除倒数第二个元素时, 不会发生并发修改异常, 因为size--, 此时cursor恰好与size相等, hasNext退出循环, 
+        // 不执行next, 也就不会发出并发修改异常
+        // foreach与之类似
+        while(iterator.hasNext()){
+            String item = iterator.next();
+            if ("3".equals(item)){
+                list.remove(item);
+            }
+        }
+//        for (String item:list){
+//            if ("3".equals(item)){
+//                list.remove(item);
+//            }
+//        }
+
+    }
+}
+```
+
+
 
 #### 12.5.4 Enumeration输出(JSP与开发框架中会有涉及到 )
 
@@ -6389,48 +7445,221 @@ public class Test {
 
 ### 12.6 偶对象保存(Map接口)
 
-> 两个子类:  HashMap    HashTable,  保存数据的目的是为例方便查找
+> 利用map来存储的数据的, 不应该通过引用来修改数据, 否则可能会找不到修改后的数据
+
+```bash
+
+1. 两个主要的子类:  `HashMap` `HashTable`,  保存数据的目的是为了方便查找
+2. Map是Map集合体系的顶级接口
+3. Map的实现子类, 不允许存储"重复元素"
+4. 有些子实现允许存储null(指key)(HashMap, LinkedHashMap) , 有些子实现不允许存储null(指key)(TreeMap)
+5. 有些子实现是有序的(LinkedHashMap, TreeMap(大小有序)), 有些子实现是无序的(HashMap)
+```
+
+
+
+
+
+Java是一个偏应用的语言, 面向实际问题
+
+**key-value键值对具有自我描述性**
 
 #### 12.6.1 常用方法
 
-- 向集合中保存数据
+- **向集合中保存数据**!
 
   ```java
   public V put(K key, V value)
   ```
 
-- 根据key查找对应的value数据
+- **根据key查找对应的value数据**
 
   ```java
   public V get(Object key)
   ```
 
-- 将Map集合转化为Set集合
+- **根据key值进行删除操作**
 
   ```java
-  public Set<Map Entry<K, V>> entrySet()
+  public V remove(Object key);
   ```
 
-- 取出全部的key
+  
+
+- **将Map集合转化为Set集合(视图方法)**
+
+  ```java
+  public Set<Map.Entry<K, V>> entrySet()
+  ```
+
+- 取出全部的key (**视图方法**)
 
   ```java
   public Set<K> keySet()
   ```
 
-#### 12.6.2 HashMap子类
 
-- 特点:
-  - **put()方法，key值相同时新值会替换旧值**
-  - 无序存放
-  - **key或value可以保存为null**
-  - get方法, key不存在时, 返回null
-  - 采用异步处理, 非线程安全
+
+
+
+### 12.6.2 HashMap(Map的子类)
+
+```
+1.是Map的一个子类
+
+2. 底层结构是: 数组 + 链表  + 红黑树
+
+3. 数组的初始容量(默认16)        数组扩容(默认扩为原来的2倍)
+
+4. 无序存放(指的是不会按照put的先后顺序排序)
+
+5. key或value可以保存为null
+
+6. 不允许存储重复key  (HashMap如何定义数据重复?)
+
+7. 采用异步处理, 非线程安全
+
+8. 默认的加载因子是0.75
+
+9. key值相同时, 新值会替换旧值
+10. get方法, key不存在时, 返回null
+```
+
+#### 底层结构
+
+1. 数组  +  链表  + 红黑树
+2. JDK1.8  之前:  没有红黑树
+3. JDK1.8之后:  补充了红黑树(jdk在这一版做了改进)
+4. 红黑树:  有链表实现的
+
+5. 存储模型
+
+   ![image-20210311194739338](Java基础.assets/image-20210311194739338.png)
+
+
+
+<img src="Java基础.assets/image-20210311194752030.png" alt="image-20210311194752030" style="zoom: 50%;" />
+
+
+
+
+
+#### **什么是加载因子**
+
+- `存储元素个数` 大于` (加载因子  * 数组长度)`  时需要扩容
+- 尽量在使用`HaspMap`的时候, 使用默认加载因子`0.75`, 如果有需要, 把它的加载因子设置在`0.5~1`
+
+#### HashMap存储元素的过程
+
+1. 先把存储的key-value数据中的key拿出来, 计算hash值
+
+   ```java
+   // 进行异或运算是为了充分散列(直接取余时, 如果hashcode值和数组长度相差过大, 那么hashcode值的高位就不起作用了, 此处右移16位就是此目的)
+   int hash = (h = key.hashCode()) ^ (h >>> 16)
+   ```
+
+2. 把key经过计算的`hash`值拿出来,和底层数组长度取余, 得到一个数组下标, 这个下表就是这个key-value数据在数组中存储的位置.
+
+3.  有可能经过key获得他的hash, 得到的下标对应的存储位置没有存储元素, 可以直接存储一个Node
+
+   ```
+   Node结点内容:  hash, key, value, next
+   ```
+
+4. 有可能经过key获得他的hash, 又取余, 得到下标, 发现这个下标所对应的存储位置已经存储了元素, 于是进行比较
+
+   1.   如果重复,  新value值覆盖就value值
+   2.   如果不重复, 判断时红黑树还是链表, 如果是链表, 则按照链表的比较方法, 如果是红黑树, 则按照红黑树的比较方式
+
+#### 其他需要注意的点
+
+1. 对于HashMap来说, 什么是重复元素?
+
+   源码中对重复元素的判断
+
+   ```java
+   if (p.hash == hash && (k=p.key) == key) || (key != null && key.equals(k))
+       e=p;
+   ```
+
+   **翻译翻译**
+
+   ==先检测存储位置的元素p的hash值是否和将要put的元素的hash值一样, 不一样则不重复, 否则, 再看两者的key值本身是否直接相等(地址比较)或者key内容比较(equals方法), 两者符合其一则相等==
+
+2. 链表什么时候转化为红黑树
+
+   ```java
+   //  MIN_TREEIFY_CAPACITY = 64
+   if (tab == null || (n = tab.length) < MIN_TREEIFY_CAPACITY)
+               resize();
+   ```
+
+   ==链表长度超过8, 达到9的时候, 转化为红黑树==, 前提是底层数组长度需要大于等于64
+
+   链表超过8达到9的时候, 链表不一定转化为红黑树, 如果底层数组长度小于64, 则优先选择扩容, 而非转化为红黑树
+
+3. 红黑树什么时候转化为链表
+
+   ```
+   Root !=null root.left != null root.right != null root.left.left != null
+   ```
+
+   
 
 #### 12.6.3 HashTable子类
 
-- 特点:
-  - **key和value均不可为null**
-  - 采用同步处理, 线程安全
+==`HashMap`与`HashTable`的区别==
+
+|                             | HashMap                                             | HashTable                                              |
+| --------------------------- | --------------------------------------------------- | ------------------------------------------------------ |
+| 底层结构                    | 数组 +  链表  + 红黑树                              | 数组  +  链表                                          |
+| 版本                        | jdk1.2产生了HashMap,  jdk1.8之后增加了红黑树        | JDK1.0产生                                             |
+| 线程安全                    | 线程不安全                                          | 线程安全                                               |
+| 初始容量                    | 16                                                  | 11                                                     |
+| 扩容机制                    | 2倍                                                 | 2倍 + 1                                                |
+| new一个对象时, 指定数组长度 | 将大于等于给定值的2的最小幂值作为底层数组长度       | 给多少是多少                                           |
+| 取Hash值和获取下标的方      | hash = hashcode ^ (hash >>> 16)  位运算计算数组下标 | hash = hashcode();   (hash & 0x7FFFFFFF) % tab.length; |
+
+
+
+```
+1. key和value均不可以是null
+2. 采用同步处理, 线程安全
+```
+
+
+
+#### 12.6.4 LinkedListMap
+
+```
+1. HashMap的子类, 和HashMap大体相似
+2. LinkedListMap根据结点添加顺序, 维护了一个双向链表
+3. 有序存放 (物理位置上并不有序, 有序体现再双向链表上)
+```
+
+
+
+
+
+#### 12.6.5 TreeMap
+
+```bash
+1. Map接口的子类, 底层是红黑树
+2. TreeMap里面元素存储的时候需要比较
+3. 有序(大小有序)
+4. key不允许存储null(null无法比较大小), `key`需要实现`Comparable`接口的`compareTO`方法
+5. 不允许存储重复元素(比较大小)
+6. 线程不安全
+```
+
+TreeMap元素比较方式
+
+1. 让元素实现自然顺序
+2. **不用方式1, 可以再TreeMap中提供一个比较器**
+
+==TreeMap比较独特的API都是和元素大小息息相关的==
+
+
 
 #### 12.6.7 利用Iterator输出Map集合
 
@@ -6510,49 +7739,58 @@ public class Test {
   
     
 
+### HashTable
+
+
+
 ### 12.8 Properties类(HashTable子类)
+
+==HashTable子类==
+
+==Properties主要是用来做"持久化"==
+
+==虽然是Hashtable子类，但主要用自己定义的方法==
+
+properties里面存储数据, 如果需要做`持久化`, 那么`key-value值`的类型均必须是`String`类型
+
+对资源文件的处理，往往使用Properties类处理
 
 #### 12.8.1常用方法
 
-- 设置属性
+设置属性
 
-  ```java
-  public Object setProperty(String key, String value)
-  ```
+```java
+public Object setProperty(String key, String value)
+```
 
-- 取得属性, 如果key不存在, 则返回null
+取得属性, 如果key不存在, 则返回null
 
-  ```java
-  public String getProperty(String key)
-  ```
+```java
+public String getProperty(String key)
+```
 
-- 取得属性, 如果key不存在, 则返回默认值
+取得属性, 如果key不存在, 则返回默认值
 
-  ```java
-  public String getProperty(String key, String defaultValue)
-  ```
+```java
+public String getProperty(String key, String defaultValue)
+```
 
-- 通过输出流保存属性内容, 输出的同时可以设置注释信息
+通过输出流保存属性内容, 输出的同时可以设置注释信息
 
-  ```java
-  public void store(OutputStream out, String comments) throws IOException;
-  public void store(Writer writer, String comments) throws IOException;
-  ```
+```java
+public void store(OutputStream out, String comments) throws IOException;
+public void store(Writer writer, String comments) throws IOException;
+```
 
-- 通过输入流读取属性内容
+通过输入流读取属性内容
 
-  ```java
-  public void load(InputStream inStream) throws IOException;
-  // 此处可以通过转换流指定编码字符集, 以便读取中文
-  public void load(Reader reader) throws IOEXception;
-  ```
+```java
+public void load(InputStream inStream) throws IOException;
+// 此处可以通过转换流指定编码字符集, 以便读取中文
+public void load(Reader reader) throws IOEXception;
+```
 
-#### 12.8.2 特点
 
-- **只能保存字符串类型的数据（key = value）** 
-
-- 虽然是Hashtable子类，但主要用自己定义的方法
-- **对资源文件的处理，往往使用Properties类处理**
 
 #### 12.8.3 与ResourceBundle类比较
 
@@ -6560,7 +7798,7 @@ public class Test {
 
   - 都可以读取properties文件
 
-- 不同点p
+- 不同点
 
   - **Properties类可以读取任意输入流,**  ResourceBunble只能读取properties文件
   - ResourceBundle类可以与Locale类结合读取不同语言资源文件的功能Properties类却没有
@@ -6576,6 +7814,8 @@ public class Test {
 ### 12.9 Collections工具类
 
 > 注意: Collections  而不是Collection	
+>
+> `Collections.addAll()` 运行得更快
 
 #### 12.9.1 常用方法
 
@@ -6759,34 +7999,52 @@ public class Test {
 
 #### 12.11.1 使用Array还是ArrayList
 
-![image-20210131143941861](Java基础.assets/image-20210131143941861.png)
+1. 数组(Array)中保存的内容是固定的, 而数组列表(ArrayList)中保存的内容是可变的
+2. 在已经`确定好长度`的前提下,完全可以使用数组(Array)来替代数组列表
+3. `长度不确定`, 使用ArrayList
 
 #### 12.11.2 ArrayList和LinkedList的区别
 
-- ArrayList采用顺序式的结果进行数据的保存，并且可以自动生成相应的索引信息；
-- LinkedList集合保存的是前后元素，也就是说，它每一个节点中保存的是两个元素对象，一个它对应的下一个节点，以及另外一个它对应的上一个节点，所以LInkedList要占用比ArrayList更多的内存空间。同时LinkedList比ArrayLIst多实现了一个Queue队列数据接口
+- `ArrayList`(线性表)采用`顺序式`的结果进行数据的保存，并且可以自动生成相应的索引信息；
+
+- `LinkedList`(链表)集合保存的是前后元素，也就是说，它每一个节点中保存的是两个元素对象，一个它对应的下一个节点，以及另外一个它对应的上一个节点，
+
+  ==LInkedList要占用比ArrayList更多的内存空间, 同时LinkedList比ArrayLIst多实现了一个Queue队列数据接口==
+
+  
 
 #### 12.11.3 ArrayList和Vector子类的区别
 
-![image-20210131145325496](Java基础.assets/image-20210131145325496.png)
+| 区别     | ArrayList                       | Vector                                       |
+| -------- | ------------------------------- | -------------------------------------------- |
+| 推出时间 | JDK1.2推出                      | JDK1.0, 属于旧的类                           |
+| 性能     | 采用异步处理                    | 采用同步处理                                 |
+| 数据安全 | 非线程安全                      | 线程安全                                     |
+| 输出     | Iterator, ListIterator, foreach | Iterator, ListIterator, foreach, Enumeration |
+
+
 
 #### 12.11.4 Map和Collection的区别
 
-![image-20210131155616280](Java基础.assets/image-20210131155616280.png)
+Collection接口数据是为了输出, 
+
+Map接口数据是为了查询
 
 #### 12.11.5 HashMap与HashTable的区别
 
-![image-20210131155845142](Java基础.assets/image-20210131155845142.png)
-
 #### 12.11.6 Properties类还是ResourceBundle类
 
-![image-20210131163636531](Java基础.assets/image-20210131163636531.png)
+1. `ResourceBundle`类只能读取后缀`*.properties`的文件, 往往需要通过Locale类来数值当前国家即语言环境.
+2. Properties类只要符合它保存数据的结构标准的输入流数据都可以读取
+3. 如果读取国际化资源文件使用Resource Bundle类, 如果读取一些配置信息则可以使用Properties类
+
+
 
 #### 12.11.7 Collection与Collections的区别
 
-- Collection：集合操作的子接口，包含List接口和Set接口
+- `Collection`：集合操作的子接口，包含List接口和Set接口
 
-- Collections：集合操作的工具类，可以直接利用类中提供的方法对List、Set、Map等集合的数据操作
+- `Collections`：集合操作的工具类，可以直接利用类中提供的方法对List、Set、Map等集合的数据操作
 
   
 
